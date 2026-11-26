@@ -65,7 +65,7 @@ torsion-free groups.
 | `abs τ((A/4)² P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}` | `ThomFejer.WeightedLqTarget` | with `muA_no_atoms`, `μ_A ≪ dE`; `q = 2` is `WeightedTarget` | compatible with the exact flux averages for `q ≥ 2` |
 | `abs τ(P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}`, some `q < ∞` | `ThomConclusions.LqTarget` | `μ_A ≪ dE`; forces `μ_A([−h,h]) = O(h^{1/q})` (`ThomFejer.muA_le_of_lqTarget`); refuted by `LogSqLowerBound` (`ThomLowerBound.not_lqTarget_of_logSq`) | numerically false for every `q < ∞` |
 | `sup_N ∫ F_N log F_N dρ < ∞` (Fejér entropy) | `ThomWeightedL2.FejerEntropyTarget` | `μ_A ≪ dE` (`muA_ac_of_fejerEntropyTarget`); implied by every `FejerTarget p` | **recommended**: compatible with a `1/(abs E log³)` profile at `0`; increments decay by `≈ 0.72` per doubling of `N` up to `N = 512` |
-| `∑_k D_k(λ) < ∞`, `λ = θ_*μ_A` (dyadic discrepancies) | `Summable (ThomDyadic.dyDisc ThomDyadicTarget.lam)` | `μ_A ≪ dE` (`ThomDyadicTarget.muA_ac_of_summable_dyDisc`) | undecided: `D_k ≈ 0.03–0.04` at the levels resolved by `Q ≤ 809` |
+| `∑_k D_k(λ) < ∞`, `λ = θ_*μ_A` (dyadic discrepancies) | `Summable (ThomDyadic.dyDisc ThomDyadicTarget.lam)` | `μ_A ≪ dE` (`ThomDyadicTarget.muA_ac_of_summable_dyDisc`) | undecided: `D_k ≈ 0.03–0.04` at the levels resolved by `Q ≤ 601` |
 | `μ_A([−h,h]) ≥ c/log²(1/h)` (a lower bound, not a regularity target) | `ThomLowerBound.LogSqLowerBound` | refutes `LqTarget q` (all `q ≥ 1`), `FejerTarget p` (all `p > 1`), `PrincipalTarget` | numerically true (`≈ 0.47/log²(1/h)`); certified only at `h ≈ 0.2` |
 
 `ThomConclusions.NoAtomTarget` (`μ_A{0} = 0`) is no longer open: it is proved as

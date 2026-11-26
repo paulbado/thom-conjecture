@@ -211,3 +211,70 @@ Up to `k = 8` the values for the two `Q` agree and grow by about `0.002` per lev
 the **weighted** `L^q` target (`ThomFejer.WeightedLqTarget`, `q ≥ 2`), which together with the
 absence of atoms gives `μ_A ≪ Lebesgue` (`ThomFejer.muA_ac_of_weightedLqTarget`). It does not
 prove it.
+
+## Round 5: dyadic entropy, Fejér entropy, weighted energies, transfer audit
+
+Scripts: `dyadic_entropy.py K Q…` (outputs `out_dyadic_entropy.txt` for `Q = 53…401`, and
+`out_dyadic_entropy_large.txt` for `Q = 601`), `gauss_lower.py` (output `out_gauss_lower.txt`).
+`λ = θ_*ν_Q`, `θ = arccos(E/4)/π`; cell masses at level 16 are exact differences of the exact
+distribution function. Lean counterparts: `ThomDyadic.dyEnt`, `dyDisc`, `ThomChebyshev.fejEnt`.
+
+| k | H_k Q=199 | H_k Q=293 | H_k Q=401 | H_k Q=601 | D_k Q=199 | D_k Q=293 | D_k Q=401 | D_k Q=601 | wL² Q=401 | wL² Q=601 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 4 | 0.42651 | 0.43016 | 0.42662 | 0.42897 | 0.0327 | 0.0262 | 0.0297 | 0.0288 | 0.1444 | 0.1453 |
+| 5 | 0.44310 | 0.44343 | 0.44163 | 0.44353 | 0.0392 | 0.0399 | 0.0398 | 0.0382 | 0.1509 | 0.1518 |
+| 6 | 0.46295 | 0.46364 | 0.46180 | 0.46289 | 0.0387 | 0.0345 | 0.0366 | 0.0349 | 0.1557 | 0.1563 |
+| 7 | 0.48259 | 0.48112 | 0.48032 | 0.48056 | 0.0408 | 0.0307 | 0.0279 | 0.0253 | 0.1611 | 0.1614 |
+| 8 | 0.50384 | 0.49702 | 0.49458 | 0.49344 | 0.0723 | 0.0470 | 0.0311 | 0.0284 | 0.1643 | 0.1634 |
+| 9 | 0.54479 | 0.52321 | 0.51138 | 0.50820 | 0.1123 | 0.0788 | 0.0720 | 0.0411 | 0.1678 | 0.1667 |
+| 10 | 0.61102 | 0.56927 | 0.55288 | 0.53103 | 0.1518 | 0.1046 | 0.0890 | 0.0730 | 0.1770 | 0.1707 |
+| 11 | 0.69898 | 0.63011 | 0.60472 | 0.57347 | 0.1634 | 0.1446 | 0.1133 | 0.0950 | 0.1941 | 0.1820 |
+| 12 | 0.79354 | 0.71408 | 0.67111 | 0.62883 | 0.2374 | 0.1829 | 0.1473 | 0.1237 | 0.2233 | 0.2029 |
+| 13 | 0.93570 | 0.82143 | 0.75629 | 0.69991 | 0.3111 | 0.2495 | 0.2024 | 0.1573 | 0.2735 | 0.2363 |
+
+| N | H_N Q=199 | H_N Q=293 | H_N Q=401 | H_N Q=601 | ∫F_N² Q=601 |
+|---|---|---|---|---|---|
+| 16 | 0.27363 | 0.27363 | 0.27363 | 0.27363 | 1.4505 |
+| 32 | 0.34456 | 0.34455 | 0.34456 | 0.34456 | 1.5743 |
+| 64 | 0.39732 | 0.39732 | 0.39732 | 0.39732 | 1.6865 |
+| 128 | 0.43427 | 0.43415 | 0.43415 | 0.43414 | 1.7833 |
+| 256 | 0.46085 | 0.46015 | 0.45998 | 0.45997 | 1.8719 |
+| 512 | 0.48353 | 0.48046 | 0.47934 | 0.47871 | 1.9580 |
+| 1024 | 0.51603 | 0.50262 | 0.49707 | 0.49399 | 2.0499 |
+
+Values are converged in `Q` (to about `10⁻³`) up to level 8 for `Q = 601`; deeper levels and
+`N = 1024` are still moving with `Q`, so they are upper bounds on the limit.
+
+* **Dyadic entropy (N).** Converged increments `H_{k+1} − H_k`: `0.019, 0.018, 0.013, 0.013` for
+  `k = 5…8` (`Q = 601`). `D_k` ≈ `0.025–0.04` at the same levels. No decay is visible yet, and
+  no growth either. Within `|θ − 1/2| < 2⁻⁶` (3% of `[0,1]`), `D_k`'s share is 34–50% at
+  `k = 6–8` and about 5% for `k ≥ 12` (the latter in the unconverged range). At resolved scales
+  the discrepancy is **not** concentrated at `E = 0`. The summability of `D_k` is undecided.
+* **Fejér entropy (N).** `H_N` is converged for `N ≤ 256` and nearly converged at `N = 512`.
+  Its increments per doubling are `0.071, 0.053, 0.037, 0.026, 0.019` (`N = 16 → 512`), a ratio
+  of ≈ 0.72. At `N = 1024` the increment is `≤ 0.015` and still decreasing with `Q`. In
+  contrast, `∫F_N² dρ` grows by `0.124, 0.112, 0.097, 0.089, 0.086, 0.092`: no decay, consistent
+  with an `L²` divergence. If the ratio persisted, `sup H_N ≈ 0.53`. This is evidence for
+  `FejerEntropyTarget`, not a proof.
+* **Weighted `L²` energy (N).** The binned energy of `(E²/16)ν_Q` at level `k` is converged
+  up to `k = 9`: `0.1518, 0.1563, 0.1614, 0.1634, 0.1667` for `k = 5…9`, increments
+  `0.005, 0.005, 0.002, 0.003`. This is compatible with `WeightedTarget` but does not decide it
+  (a logarithmic divergence of `≈ 0.003` per level is also compatible).
+* **Contributions near `0` (N).** The round-4 local masses (`out_flux_local.txt`) are stable in
+  `Q` down to `h = 2⁻¹⁸`, because the zero band of `N_{1/2+δ}` has width `e^{−0.3/|δ|}`, and
+  `|δ| ≥ 1/Q` resolves `h ≥ e^{−0.3Q}`. So the local law at `0` is resolved far below the
+  dyadic resolution limit, while global dyadic quantities are limited by the narrow bands
+  everywhere else.
+* **Certified bound (U, computer-assisted).** `μ_A((−0.196, 0.196)) ≥ 0.0696`
+  (`out_gauss_lower.txt`; `n = 59` Gauss nodes, exact rational recurrence coefficients).
+* Q = 809 was started and stopped, because the run would take about 35 minutes; the table stops
+  at `Q = 601`.
+
+**Resolution rule.** At fixed `Q` the dyadic quantities agree with larger `Q` only up to level
+`≈ log₂ Q + 1` to `2`. Past that level `H_k` grows by about `0.25` per level for every `Q`: an
+artefact of the narrow bands of the individual `N_{p/q}`, not of `μ_A`.
+
+**Transfer audit.** Moment matching (degree `< N_Q`) certifies nothing below scale `≈ 12/n`
+(Gauss-node spacing at `0`). The only rigorous lower bound at `0` from the 121 exact moments is
+`μ_A((−0.196, 0.196)) ≥ 0.0696`. The log² law at `h ≤ 2⁻⁴` rests on the stability in `Q` of the
+exact `ν_Q`, not on moments.
