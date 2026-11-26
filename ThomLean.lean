@@ -18,3 +18,8 @@ import ThomLean.Chebyshev.Duality
 import ThomLean.NoAtoms
 import ThomLean.Chebyshev.Fejer
 import ThomLean.FejerTarget
+import ThomLean.Chebyshev.Dyadic
+import ThomLean.DyadicTarget
+import ThomLean.Chebyshev.Entropy
+import ThomLean.WeightedL2
+import ThomLean.LowerBound

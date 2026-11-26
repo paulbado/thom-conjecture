@@ -36,6 +36,20 @@ torsion-free groups.
   `tendsto_integral_fejer_mul_poly`, `ac_of_fejer_bounded`: the Fejér densities are positive,
   normalised, converge to `μ` on polynomials, and `sup_N ‖F_N‖_{L^p} < ∞` (`p > 1`) gives the
   `L^q` duality bound and `μ ≪ Lebesgue`.
+* **Entropy criteria (round 5).** `ThomChebyshev.ac_of_fejEnt_bounded`: bounded Fejér relative
+  entropies `H_N = ∫ F_N log F_N dρ` give uniform integrability of the Fejér densities and
+  `μ ≪ Lebesgue`; this criterion contains every Fejér `L^p` criterion and is strictly weaker
+  (`fejEnt_le_of_Lp`, `entropy_strictly_weaker`). `ThomDyadic`: the dyadic entropy increment
+  identity, `0 ≤ H_{k+1} − H_k ≤ D_k`, and "bounded dyadic entropy (or summable discrepancies)
+  ⇒ absolute continuity", transported to `μ_A` by `θ = arccos(E/4)/π`
+  (`ThomDyadicTarget.muA_ac_of_summable_dyDisc`).
+* **The two weighted targets are one (round 5).** `ThomWeightedL2.weightedLqTarget_two_iff :
+  WeightedLqTarget 2 ↔ WeightedTarget`. Localization: `μ_A ≪ dE` iff its restrictions to
+  `{abs E ≥ ε}` are absolutely continuous (`muA_ac_iff_local`).
+* **Lower bounds at `0` (round 5).** `ThomLowerBound.le_measureReal_of_moments` transfers lower
+  bounds on compact sets from moment-matching approximants (such as the rational-flux averages)
+  to `μ_A`; `not_lqTarget_of_logSq` shows that `μ_A([−h,h]) ≥ c/log²(1/h)` would refute every
+  `LqTarget q`, every Fejér `L^p` target and `PrincipalTarget`. The lower bound itself is open.
 * **Conditional absolute continuity.** Each open target below implies `μ_A ≪ Lebesgue`
   (`ThomConclusions.muA_ac_of_principal`, `ThomNoAtoms.muA_ac_of_weightedTarget`,
   `ThomConclusions.muA_ac_of_LqTarget`, `ThomFejer.muA_ac_of_fejerTarget`,
@@ -46,9 +60,13 @@ torsion-free groups.
 | Target | Lean name | Consequence proved in Lean | Numerical status |
 |---|---|---|---|
 | `∑ τ(T_n(A/4))² < ∞` | `ThomBridge.PrincipalTarget` | `μ_A ≪ dE` with `L²(arcsine)` density (equivalence) | numerically false (mass `≈ 0.47/log²(1/h)` at `0`, see below) |
-| `∑ (c_{n-2}+2c_n+c_{n+2})² < ∞` | `ThomBridge.WeightedTarget` | **alone** gives `μ_A ≪ dE` (`ThomNoAtoms.muA_ac_of_weightedTarget`) | inconclusive (flux averages: weighted `L²` norm grows `≈ 0.002` per octave up to `2⁸` bins) |
+| `∑ (c_{n-2}+2c_n+c_{n+2})² < ∞` | `ThomBridge.WeightedTarget` | **alone** gives `μ_A ≪ dE` (`ThomNoAtoms.muA_ac_of_weightedTarget`); **equivalent** to `WeightedLqTarget 2` (`ThomWeightedL2.weightedLqTarget_two_iff`) | inconclusive: binned weighted `L²` energy converged in `Q` up to `2⁹` angular cells, growing `≈ 0.003` per level there |
 | `sup_N ∫ abs(F_N)^p dρ < ∞`, `p > 1` (Fejér densities) | `ThomFejer.FejerTarget` | `μ_A ≪ dE`; `p = 3/2` gives `LqTarget 3` | numerically false for every `p > 1` (same reason) |
-| `abs τ((A/4)² P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}` | `ThomFejer.WeightedLqTarget` | with `muA_no_atoms`, `μ_A ≪ dE` | **recommended**: compatible with the exact flux averages for `q ≥ 2` |
+| `abs τ((A/4)² P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}` | `ThomFejer.WeightedLqTarget` | with `muA_no_atoms`, `μ_A ≪ dE`; `q = 2` is `WeightedTarget` | compatible with the exact flux averages for `q ≥ 2` |
+| `abs τ(P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}`, some `q < ∞` | `ThomConclusions.LqTarget` | `μ_A ≪ dE`; forces `μ_A([−h,h]) = O(h^{1/q})` (`ThomFejer.muA_le_of_lqTarget`); refuted by `LogSqLowerBound` (`ThomLowerBound.not_lqTarget_of_logSq`) | numerically false for every `q < ∞` |
+| `sup_N ∫ F_N log F_N dρ < ∞` (Fejér entropy) | `ThomWeightedL2.FejerEntropyTarget` | `μ_A ≪ dE` (`muA_ac_of_fejerEntropyTarget`); implied by every `FejerTarget p` | **recommended**: compatible with a `1/(abs E log³)` profile at `0`; increments decay by `≈ 0.72` per doubling of `N` up to `N = 512` |
+| `∑_k D_k(λ) < ∞`, `λ = θ_*μ_A` (dyadic discrepancies) | `Summable (ThomDyadic.dyDisc ThomDyadicTarget.lam)` | `μ_A ≪ dE` (`ThomDyadicTarget.muA_ac_of_summable_dyDisc`) | undecided: `D_k ≈ 0.03–0.04` at the levels resolved by `Q ≤ 809` |
+| `μ_A([−h,h]) ≥ c/log²(1/h)` (a lower bound, not a regularity target) | `ThomLowerBound.LogSqLowerBound` | refutes `LqTarget q` (all `q ≥ 1`), `FejerTarget p` (all `p > 1`), `PrincipalTarget` | numerically true (`≈ 0.47/log²(1/h)`); certified only at `h ≈ 0.2` |
 
 `ThomConclusions.NoAtomTarget` (`μ_A{0} = 0`) is no longer open: it is proved as
 `ThomNoAtoms.noAtomTarget`.
@@ -58,8 +76,8 @@ validated against the walk counts) give `ν_Q([−h,h]) · log²(1/h) ≈ 0.47` 
 `2⁻¹⁸ ≤ h ≤ 2⁻⁴`, stable in `Q`. The mechanism is the zero Landau level near flux `1/2`
 (`2|δ|q` bands within `e^{−0.3/|δ|}` of `0`). This is evidence, not a proof; a proof of the lower
 bound `μ_A([−h,h]) ≥ c/log²(1/h)` would refute these targets formally via
-`muA_le_of_lqTarget`. See `numerics/README.md`, round 4.
-| `abs τ(P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}`, some `q < ∞` | `ThomConclusions.LqTarget` | `μ_A ≪ dE`; forces `μ_A([−h,h]) = O(h^{1/q})` (`ThomFejer.muA_le_of_lqTarget`) | numerically false for every `q < ∞` |
+`muA_le_of_lqTarget`. See `numerics/README.md`, round 4. Round 5 makes this implication a theorem
+(`ThomLowerBound.not_lqTarget_of_logSq`) and audits the transfer from `ν_Q` to `μ_A`: see §8.
 
 ## Verification
 
@@ -81,7 +99,7 @@ To reproduce locally:
 ```bash
 lake exe cache get                 # optional: download the Mathlib build cache
 lake build                         # compile everything
-scripts/check_axioms.sh audit.txt  # sorry / axiom scan + #print axioms on 100 theorems
+scripts/check_axioms.sh audit.txt  # sorry / axiom scan + #print axioms on 195 theorems
 scripts/module_status.sh           # per-module build table
 ```
 
@@ -113,6 +131,11 @@ The live status of every module is in the summary of the latest workflow run.
 | `ThomLean.NoAtoms` | `ThomLean/NoAtoms.lean` | ✅ passing | 39 | 24 |
 | `ThomLean.Chebyshev.Fejer` | `ThomLean/Chebyshev/Fejer.lean` | ✅ passing | 20 | 15 |
 | `ThomLean.FejerTarget` | `ThomLean/FejerTarget.lean` | ✅ passing | 12 | 11 |
+| `ThomLean.Chebyshev.Dyadic` | `ThomLean/Chebyshev/Dyadic.lean` | ✅ passing | 29 | 16 |
+| `ThomLean.DyadicTarget` | `ThomLean/DyadicTarget.lean` | ✅ passing | 12 | 7 |
+| `ThomLean.Chebyshev.Entropy` | `ThomLean/Chebyshev/Entropy.lean` | ✅ passing | 9 | 7 |
+| `ThomLean.WeightedL2` | `ThomLean/WeightedL2.lean` | ✅ passing | 9 | 8 |
+| `ThomLean.LowerBound` | `ThomLean/LowerBound.lean` | ✅ passing | 6 | 6 |
 
 | File | Content |
 |---|---|
@@ -136,6 +159,11 @@ The live status of every module is in the summary of the latest workflow run.
 | `ThomLean/NoAtoms.lean` | unconditional absence of atoms of `μ_A`, log modulus of continuity |
 | `ThomLean/Chebyshev/Fejer.lean` | Fejér densities, positivity, Fejér criterion |
 | `ThomLean/FejerTarget.lean` | Fejér and weighted `L^q` targets for `μ_A`, power decay forced by `LqTarget` |
+| `ThomLean/Chebyshev/Dyadic.lean` | dyadic entropy and discrepancy on `[0,1)`, increment identity, criteria |
+| `ThomLean/DyadicTarget.lean` | transport `λ = θ_*μ_A`, back-transport of absolute continuity |
+| `ThomLean/Chebyshev/Entropy.lean` | Fejér relative entropy, uniform integrability, criterion, strictness |
+| `ThomLean/WeightedL2.lean` | `WeightedTarget ⇔ WeightedLqTarget 2`, localization, entropy target |
+| `ThomLean/LowerBound.lean` | transfer of lower bounds, `LogSqLowerBound ⇒ ¬LqTarget` |
 | `Audit.lean` | `#print axioms` for the principal theorems |
 | `numerics/` | Python scripts and data, not part of the proofs |
 
@@ -315,6 +343,58 @@ its window `h_L` shrinks like `D^{−L}`, so it only controls intervals of lengt
 `1/2` (numerically `μ_A([−h,h]) ≈ 0.47/log²(1/h)`). The open question that remains is a
 weighted bound, for example `WeightedLqTarget 2`: an `L²` (or `L^p`, `p > 1`) density for
 `(E²/16)μ_A`.
+
+### 8. Entropy, dyadic discrepancies, weighted `L²`, lower bounds at `0` (round 5)
+
+| Statement | Lean name | Status |
+|---|---|---|
+| Dyadic cells `[j2^{-k}, (j+1)2^{-k})`, splitting, disjointness, length `2^{-k}` | `ThomDyadic.cell_split`, `cell_pairwiseDisjoint`, `volume_real_cell` | U |
+| **Increment identity** `H_{k+1} − H_k = ∑_I [a log(2a/(a+b)) + b log(2b/(a+b))]`, `a = λ(I₋)`, `b = λ(I₊)` | `dyEnt_succ_sub`, `klTerm_eq` | U |
+| **Increment bounds** `0 ≤ H_{k+1} − H_k ≤ D_k = ∑_I (λ(I₋) − λ(I₊))²/λ(I)` (zero-mass terms are `0`) | `dyEnt_succ_sub_nonneg`, `dyEnt_succ_sub_le`, `klTerm_nonneg`, `klTerm_le` | U |
+| `H_k ≤ H_0 + ∑_{i<k} D_i`; `H_k` is nondecreasing | `dyEnt_le`, `dyEnt_mono` | U |
+| Cells carrying mass more than `M` times their length: `∑_G λ(I) ≤ M·abs(G) + (B+2)/log M` when `H_k ≤ B` | `sum_mass_le` | U |
+| **Bounded dyadic entropy ⇒ `λ ≪ dx`**; **summable `D_k` ⇒ `λ ≪ dx`** (finite `λ` carried by `[0,1)`) | `ac_of_dyEnt_bounded`, `ac_of_summable_dyDisc` | C |
+| `D_k` is subadditive: `D_k(∑ νᵢ) ≤ ∑ D_k(νᵢ)` (Sedrakyan) | `dyDisc_finset_sum_le` | U |
+| `λ = θ_*μ_A`, `θ(E) = arccos(E/4)/π`, is a probability carried by `[0,1)` (uses `μ_A{−4} = 0`) | `ThomDyadicTarget.lam_compl_Ico` | U |
+| **Back-transport**: `λ ≪ dx ⇒ μ_A ≪ dE` (`θ` is differentiable on `(−4,4)` and maps null sets to null sets) | `muA_ac_of_lam_ac` | U |
+| Dyadic criteria for `μ_A` | `muA_ac_of_dyEnt_bounded`, `muA_ac_of_summable_dyDisc` | C |
+| `∫_U F_N dρ ≤ M ρ(U) + (H_N + 1)/log M` | `ThomChebyshev.setIntegral_fejer_le` | U |
+| **Bounded Fejér entropy ⇒ uniform integrability of `F_N`** and `μ ≪ dE` | `fejer_uniformlyIntegrable`, `ac_of_fejEnt_bounded` | C |
+| `H_N ≤ ‖F_N‖_p^p/(p−1)`: every Fejér `L^p` bound (`p > 1`) gives an entropy bound | `fejEnt_le_of_Lp`, `fejEnt_bounded_of_Lp`, `ThomWeightedL2.fejerEntropyTarget_of_fejerTarget` | U / C |
+| **Strictness**: the step profile `v_k = 2^k/k³` on `[2^{-k-1}, 2^{-k})` has convergent entropy series and divergent `L^p` series for **every** `p > 1` | `entropy_strictly_weaker` | U |
+| **`WeightedLqTarget 2 ↔ WeightedTarget`** (test `P = ∑ c_n T_n`: `∫P dν = ∑c_n²`, `‖P‖² = ∑c_n²/2`; converse by the `L²` density) | `ThomWeightedL2.summable_of_L2_bound`, `L2_bound_of_summable`, `weightedLqTarget_two_iff` | U |
+| **Localization**: `μ_A ≪ dE ⇔ ∀ ε > 0, μ_A abs restricted to {abs E ≥ ε} ≪ dE` | `muA_ac_iff_local` | U |
+| Local weighted `L²` bounds on `{abs E ≥ ε}` for each `ε` ⇒ `μ_A ≪ dE` | `muA_ac_of_local_weighted` | C |
+| **Transfer of lower bounds**: moment-matching approximants with `c ≤ ν_Q(C)` infinitely often give `c ≤ μ(C)` (`C` compact) | `ThomLowerBound.le_measureReal_of_moments`, `logSqLowerBound_of_approx` | U / C |
+| **`μ_A([−h,h]) ≥ c/log²(1/h)` refutes** every `LqTarget q` (`q ≥ 1`), every `FejerTarget p` (`p > 1`) and `PrincipalTarget` | `not_lqTarget_of_logSq`, `not_fejerTarget_of_logSq`, `not_principalTarget_of_logSq` | C |
+| `LogSqLowerBound` itself | `ThomLowerBound.LogSqLowerBound` | **P**, numerically true |
+| `FejerEntropyTarget`, summable `D_k(λ)` | `ThomWeightedL2.FejerEntropyTarget` | **P**, open |
+
+**Why flux-wise estimates cannot suffice.** `D_k` and `H_k` are convex under mixtures
+(`dyDisc_finset_sum_le` for `D_k`). Since `μ_A = ∫_0^1 N_α dα`, any bound of the form
+`D_k(μ_A) ≤ ∫ D_k(N_α) dα` with summable right side would need `∑_k D_k(N_α) < ∞` for almost
+every `α`, i.e. `N_α ≪ dE`. For the critical almost Mathieu operator the density of states is
+singular for every irrational `α` (zero-measure spectrum; Last, Avila–Krikorian), so such
+bounds fail. Absolute continuity of `μ_A`, if true, must come from **cancellation across
+fluxes**, not from the regularity of individual `N_α`. This is a mathematical remark, not a
+Lean theorem (the measures `N_α` are not formalized).
+
+**Transfer audit (Task 1).** The rational-flux averages `ν_Q` agree with `μ_A` in degree
+`< N_Q = 2⌈2√Q⌉` only; moments of degree `n` certify nothing below scale `≈ 12/n`. With the
+121 exact moments, the Chebyshev–Markov–Stieltjes inequalities give the rigorous bound
+`μ_A((−0.196, 0.196)) ≥ 0.0696` (`numerics/gauss_lower.py`), which is far from the scales
+`h ≤ 2⁻⁴` of the log² law. Certifying `h = 2⁻¹⁸` that way would need moments of degree
+`≈ 3·10⁶`. The weak limit `ν_Q → μ_A` is the correct direction for lower bounds on compact sets
+(`le_measureReal_of_moments`), so a proof of `ν_Q([−h,h]) ≥ c/log²(1/h)` for infinitely many `Q`
+at each fixed `h` (equivalently, of the zero-Landau-level estimate below for rational fluxes)
+would prove `LogSqLowerBound`. The missing estimate is:
+
+> **(ZL)** there are `c₀, δ₀ > 0` such that for every flux `α = 1/2 + δ`, `0 < abs δ < δ₀`, the
+> Harper density of states satisfies `N_α([−e^{−c₀/abs δ}, e^{−c₀/abs δ}]) ≥ abs δ`.
+
+(ZL) gives `μ_A([−h,h]) ≥ ∫_{abs δ ≤ c₀/log(1/h)} abs δ dδ = (c₀/log(1/h))²`. Semiclassical
+analysis near flux `1/2` (Helffer–Sjöstrand) and the gap labels `α`, `1 − α` around the zero
+band are the natural tools; neither is formalized here.
 
 ## Numerical evidence (see `numerics/README.md`)
 
