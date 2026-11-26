@@ -53,3 +53,80 @@ diverge logarithmically**. The growth seems to come from a concentration of `μ_
 rule out absolute continuity, a local `L^p` density with `1 < p < 2`, or a local `L²` density
 away from `E = 0`. 170 coefficients cannot settle a logarithmic question, so this needs
 confirmation by larger computations or by analysis.
+
+## Round 3: weighted energies, atom at zero, local singularities (n ≤ 256)
+
+**Status: heuristic evidence, not a proof. Finite computations cannot decide convergence.**
+
+New data: `cheb_coeffs_n256.txt` (`vec32.py 128`, float32 storage with float64 accumulation;
+it agrees with the float64 run to `2.4e-8` for `n ≤ 200`). Scripts: `common.py` (loader,
+`d_n`, Jackson kernel), `blocks.py`, `peaks.py`, `lpnorm.py`, `christoffel.py`.
+Here `d_n = (c_{n-2} + 2c_n + c_{n+2})/4` are the Chebyshev coefficients of `ν = (E²/16)μ_A`
+(Lean: `ThomChebyshev.chebCoeff_weighted`).
+
+### Dyadic blocks (`python3 blocks.py cheb_coeffs_n256.txt`)
+
+| j | block | sum c_n^2 | sum d_n^2 | D_j/D_{j-1} |
+|---|---|---|---|---|
+| 2 | [4,8) | 0.01953 | 3.232e-02 |  |
+| 3 | [8,16) | 0.09006 | 9.653e-03 | 0.299 |
+| 4 | [16,32) | 0.04645 | 4.355e-03 | 0.451 |
+| 5 | [32,64) | 0.03982 | 1.859e-03 | 0.427 |
+| 6 | [64,128) | 0.03704 | 5.887e-04 | 0.317 |
+| 7 | [128,255) (partial) | 0.04346 | 1.318e-03 | 2.238 |
+
+* The original block energies `∑_{B_j} c_n²` stay near `0.04` per octave (log divergence of `∑ c_n²`).
+* The weighted block energies decrease up to `[64,128)` and then **increase**: the block
+  `[128,255)` has `∑ d_n² = 1.32e-3`, more than twice the previous block. The individual `|d_n|`
+  stay around `3e-3 – 9e-3` for `60 ≤ n ≤ 254` with no visible decay. The partial sums
+  `0.0443, 0.0486, 0.0493, 0.0497, 0.0503` (n = 20, 40, 80, 120, 168) look convergent, but
+  the block view shows that they are not evidence of convergence. If `|d_n|` does not decay,
+  `∑ d_n²` diverges and the weighted target is false.
+
+### Atom at zero
+
+* Cesàro atom means `A_N = (N+1)⁻¹ ∑_{j≤N} (−1)^j c_{2j}` (Lean: `tendsto_atomMean`, so
+  `A_N → μ_A{0}` exactly): `0.171, 0.115, 0.074, 0.059, 0.051, 0.045, 0.040, 0.039` for
+  `n = 2N = 20, …, 254`. They decrease roughly like `N^{-1/2}`.
+* `N⁻¹ ∑_{n<N} c_n²` decreases like `1.5/N` (Lean: `atom_eq_zero_of_energy` turns
+  `→ 0` into `μ_A{0} = 0`).
+* Christoffel bounds `λ_n(0) = min_{p(0)=1} ∫ p² dμ_A` (Lean: `atom_le_tau` gives `μ_A{0} ≤ λ_n(0)`
+  once the moments are exact): `0.215 (n=8), 0.096 (32), 0.054 (98), 0.047 (126)`, again
+  `≈ n^{-1/2}`. This is what a Lebesgue density `≈ |E|^{-1/2}` near `0` would give.
+
+### Where the singular behaviour sits (`python3 peaks.py cheb_coeffs_n256.txt`)
+
+Local maxima of the Jackson-smoothed density of `μ_A` (relative to arcsine), at degrees 63, 126, 252:
+
+| E | f_63 | f_126 | f_252 |
+|---|---|---|---|
+| 0.000 | 2.992 | 3.994 | 5.549 |
+| 0.718 | 1.612 | 1.874 | 2.226 |
+| 1.104 | 1.218 | 1.221 | 1.353 |
+| 1.694 | 1.343 | 1.269 | 1.325 |
+| 1.949 | 1.620 | 1.845 | 2.202 |
+| 2.151 | 1.622 | 1.458 | 1.494 |
+| 2.572 | 2.541 | 3.004 | 3.369 |
+
+Besides `E = 0`, the smoothed density grows with the degree near `E ≈ ±0.72`, `±1.95` and
+`±2.57`. The first two are close to the band edges `±(√3 − 1) ≈ ±0.732` and `±2` of the
+flux-`1/3` Harper operator (Chambers polynomial `E³ − 6E`). The weight `E²` does not vanish
+there, which explains why the weighted energies do not decay. This points to an obstruction
+that is not located at `E = 0`.
+
+### `L^p` norms of smoothed densities (`python3 lpnorm.py cheb_coeffs_n256.txt`)
+
+| N | μ: p=1.25 | 1.5 | 1.75 | 2 | entropy | ν/ν(ℝ): p=1.5 | 2 |
+|---|---|---|---|---|---|---|---|
+| 24 | 1.0823 | 1.1491 | 1.2042 | 1.2505 | 0.3668 | 1.2156 | 1.3916 |
+| 48 | 1.0944 | 1.1724 | 1.2382 | 1.2947 | 0.4179 | 1.2681 | 1.4961 |
+| 96 | 1.1025 | 1.1895 | 1.2651 | 1.3324 | 0.4484 | 1.2954 | 1.5579 |
+| 192 | 1.1082 | 1.2024 | 1.2867 | 1.3639 | 0.4683 | 1.3083 | 1.5894 |
+| 252 | 1.1100 | 1.2066 | 1.2940 | 1.3751 | 0.4743 | 1.3112 | 1.5965 |
+
+For `p ≤ 1.75` the increments per doubling of the degree shrink by a factor of about 0.7–0.8,
+compatible with bounded `L^p(arcsine)` norms. For `p = 2` the norm keeps growing (log).
+The `L²` norm of the smoothed `ν`-density grows slowly; the Jackson kernel damps the top
+coefficients, so this column does not contradict the block table.
+This supports the `L^q` duality target with `q > 2`, i.e. an `L^p` density with `p < 2`
+(Lean: `ThomConclusions.LqTarget`, `muA_ac_of_LqTarget`).

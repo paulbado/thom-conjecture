@@ -13,6 +13,8 @@ import ThomLean.Chebyshev.Lebesgue
 * `ac_off_zero_of_weighted_summable` : `∑ d_{n+1}² < ∞ ⇒ μ|_{ℝ∖{0}} ≪ Lebesgue`.
 * `ac_of_weighted_summable` : `∑ d_{n+1}² < ∞` and `μ{0} = 0` ⇒ `μ ≪ Lebesgue`.
 * `weighted_summable_of_summable` : the old `L²` condition implies the weighted one.
+* `exists_lebesgue_density_off_zero` : `∑ d_{n+1}² < ∞ ⇒ μ|_{ℝ∖{0}} = h dE` with
+  `h ∈ L²([a,b])` for every `[a,b] ⊂ (-4,4) ∖ {0}`.
 
 All results are unconditional theorems or explicit implications.
 -/
@@ -204,5 +206,96 @@ theorem weighted_summable_of_summable (μ : Measure ℝ) [IsFiniteMeasure μ] (h
     sq_nonneg (chebCoeff μ n - chebCoeff μ (n + 4)),
     sq_nonneg (chebCoeff μ (n + 2) - chebCoeff μ (n + 4)),
     sq_nonneg (chebCoeff μ n), sq_nonneg (chebCoeff μ (n + 2)), sq_nonneg (chebCoeff μ (n + 4))]
+
+/-! ### Local `L²` regularity away from zero -/
+
+/-- The inverse weight `16/E²` on `ℝ ∖ {0}` (and `0` at `0`). -/
+def invWt (E : ℝ) : ℝ := ({0}ᶜ : Set ℝ).indicator (fun E => 16 / E ^ 2) E
+
+lemma invWt_nonneg (E : ℝ) : 0 ≤ invWt E := by
+  unfold invWt; exact indicator_nonneg (fun E _ => by positivity) E
+
+lemma measurable_invWt : Measurable invWt :=
+  Measurable.indicator (by fun_prop) (measurableSet_singleton 0).compl
+
+lemma ofReal_wt_mul_invWt (E : ℝ) :
+    ENNReal.ofReal (wt E) * ENNReal.ofReal (invWt E) = ({0}ᶜ : Set ℝ).indicator 1 E := by
+  by_cases h : E = 0
+  · subst h; simp [wt, invWt]
+  · have hE : E ∈ ({0}ᶜ : Set ℝ) := h
+    rw [indicator_of_mem hE, invWt, indicator_of_mem hE, ← ENNReal.ofReal_mul (wt_nonneg E), wt,
+      show E ^ 2 / 16 * (16 / E ^ 2) = 1 by field_simp]
+    simp
+
+/-- `μ|_{ℝ∖{0}} = (16/E²) ν`. -/
+lemma restrict_compl_zero_eq (μ : Measure ℝ) :
+    μ.restrict {0}ᶜ = (weighted μ).withDensity fun E => ENNReal.ofReal (invWt E) := by
+  rw [weighted, ← withDensity_mul (f := fun E => ENNReal.ofReal (wt E))
+    (g := fun E => ENNReal.ofReal (invWt E)) _ (ENNReal.measurable_ofReal.comp measurable_wt)
+    (ENNReal.measurable_ofReal.comp measurable_invWt), ← withDensity_indicator_one
+    (measurableSet_singleton (0 : ℝ)).compl]
+  congr 1; ext E; exact (ofReal_wt_mul_invWt E).symm
+
+/-- **Weighted criterion with local `L²` regularity away from zero.** If `∑ d_{n+1}² < ∞`,
+then `μ|_{ℝ∖{0}} = h dE` with `h ≥ 0` square-integrable on every `[a,b] ⊂ (-4,4) ∖ {0}`. -/
+theorem exists_lebesgue_density_off_zero (μ : Measure ℝ) [IsFiniteMeasure μ] (hμ : CarriedBy4 μ)
+    (hd : Summable fun n => chebCoeff (weighted μ) (n + 1) ^ 2) :
+    ∃ h : ℝ → ℝ, Measurable h ∧ (∀ E, 0 ≤ h E) ∧
+      μ.restrict {0}ᶜ = volume.withDensity (fun E => ENNReal.ofReal (h E)) ∧
+      ∀ a b : ℝ, -4 < a → b < 4 → (0 < a ∨ b < 0) → MemLp h 2 (volume.restrict (Icc a b)) := by
+  have := isFiniteMeasure_weighted μ hμ
+  rcases eq_zero_or_neZero (weighted μ) with h0 | h0
+  · refine ⟨fun _ => 0, measurable_const, fun _ => le_rfl, ?_, fun a b _ _ _ => MemLp.zero⟩
+    rw [restrict_compl_zero_eq, h0]; simp
+  set ν := weighted μ
+  set s := ν univ with hs
+  have hs0 : s ≠ 0 := by rw [hs]; exact (Measure.measure_univ_ne_zero).mpr h0.out
+  have hstop : s ≠ ∞ := measure_ne_top ν univ
+  let ν' := s⁻¹ • ν
+  have hprob : IsProbabilityMeasure ν' := isProbabilityMeasureSMul
+  have hν' : CarriedBy4 ν' := by
+    have := carried_weighted hμ
+    unfold CarriedBy4 at this ⊢; simp [ν', ν, this]
+  have hc' : Summable fun n => chebCoeff ν' (n + 1) ^ 2 := by
+    have : (fun n => chebCoeff ν' (n + 1) ^ 2) =
+        fun n => (s⁻¹.toReal) ^ 2 * chebCoeff ν (n + 1) ^ 2 := by
+      ext n; simp only [chebCoeff, ν', integral_smul_measure, smul_eq_mul]; ring
+    rw [this]; exact hd.mul_left _
+  obtain ⟨g, hgm, hg0, hν'g, hgL2⟩ := exists_lebesgue_density_of_summable ν' hν' hc'
+  have hνeq : ν = s • ν' := by
+    simp only [ν', smul_smul, ENNReal.mul_inv_cancel hs0 hstop, one_smul]
+  have hhm : Measurable fun E => s.toReal * g E * invWt E :=
+    (measurable_const.mul hgm).mul measurable_invWt
+  refine ⟨fun E => s.toReal * g E * invWt E, hhm, fun E => ?_, ?_, ?_⟩
+  · exact mul_nonneg (mul_nonneg ENNReal.toReal_nonneg (hg0 E)) (invWt_nonneg E)
+  · rw [restrict_compl_zero_eq]
+    change ν.withDensity _ = _
+    rw [hνeq, hν'g, ← withDensity_smul (f := fun E => ENNReal.ofReal (g E)) s
+      (ENNReal.measurable_ofReal.comp hgm), ← withDensity_mul
+      (f := s • fun E => ENNReal.ofReal (g E)) (g := fun E => ENNReal.ofReal (invWt E)) _
+      ((ENNReal.measurable_ofReal.comp hgm).const_smul s)
+      (ENNReal.measurable_ofReal.comp measurable_invWt)]
+    congr 1; ext E
+    simp only [Pi.mul_apply, Pi.smul_apply, smul_eq_mul]
+    rw [ENNReal.ofReal_mul (mul_nonneg ENNReal.toReal_nonneg (hg0 E)),
+      ENNReal.ofReal_mul ENNReal.toReal_nonneg, ENNReal.ofReal_toReal hstop]
+  · intro a b ha hb hab
+    obtain ⟨δ, hδ, hδE⟩ : ∃ δ : ℝ, 0 < δ ∧ ∀ E ∈ Icc a b, δ ≤ |E| := by
+      rcases hab with hab | hab
+      · exact ⟨a, hab, fun E hE => by rw [abs_of_pos (by linarith [hE.1])]; exact hE.1⟩
+      · exact ⟨-b, by linarith, fun E hE => by rw [abs_of_neg (by linarith [hE.2])]; linarith [hE.2]⟩
+    refine (hgL2 a b ha hb).of_le_mul (c := s.toReal * (16 / δ ^ 2)) hhm.aestronglyMeasurable ?_
+    refine (ae_restrict_iff' measurableSet_Icc).mpr (Filter.Eventually.of_forall fun E hE => ?_)
+    have hE0 : E ≠ 0 := fun h => by have := hδE E hE; rw [h, abs_zero] at this; linarith
+    have hiw : invWt E ≤ 16 / δ ^ 2 := by
+      rw [invWt, indicator_of_mem (show E ∈ ({0}ᶜ : Set ℝ) from hE0)]
+      apply div_le_div_of_nonneg_left (by norm_num) (by positivity)
+      rw [← sq_abs E]; exact pow_le_pow_left₀ hδ.le (hδE E hE) 2
+    rw [Real.norm_eq_abs, Real.norm_eq_abs, abs_mul, abs_mul, abs_of_nonneg ENNReal.toReal_nonneg,
+      abs_of_nonneg (invWt_nonneg E)]
+    have := abs_nonneg (g E)
+    have := ENNReal.toReal_nonneg (a := s)
+    calc s.toReal * |g E| * invWt E ≤ s.toReal * |g E| * (16 / δ ^ 2) := by gcongr
+      _ = s.toReal * (16 / δ ^ 2) * |g E| := by ring
 
 end ThomChebyshev

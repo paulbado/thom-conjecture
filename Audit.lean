@@ -96,3 +96,10 @@ open ThomChebyshev ThomHeisenberg ThomReductions ThomBridge
 #print axioms ThomConclusions.muA_ac_of_weighted_energy
 #print axioms ThomConclusions.muA_ac_of_principal
 #print axioms ThomConclusions.muA_atom_le
+#print axioms ThomChebyshev.restrict_compl_zero_eq
+#print axioms ThomChebyshev.exists_lebesgue_density_off_zero
+#print axioms ThomConclusions.muA_off_zero_local_L2
+#print axioms ThomChebyshev.ac_of_poly_Lq_bound
+#print axioms ThomConclusions.integral_polyFun_muA
+#print axioms ThomConclusions.muA_ac_of_LqTarget
+#print axioms ThomConclusions.lqTarget_two_of_principal

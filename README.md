@@ -102,6 +102,8 @@ question for torsion-free groups.
 3. (**P**, the weighted target, §5) `∑_{n≥2} (c_{n-2}+2c_n+c_{n+2})² < ∞` (`WeightedTarget`).
 4. (**P**, the atom at zero, §5) `μ_A{0} = 0`, equivalently `NoAtomTarget`; implied by the
    `EnergyGrowthTarget` `N⁻¹∑_{n<N} c_n² → 0`.
+4'. (**P**, the `L^q` duality target, §5) `∃ K, ∀ P, |τ(P(A/4))| ≤ K‖P(·/4)‖_{L^q(arcsine)}` for
+   some `q > 2`. It implies `μ_A ≪ dE` with no hypothesis on atoms.
 5. (**N**) Harper/Floquet identification of `τ_{p/q}` with `ν_{p/q}`, absolute continuity of
    `μ^{(q)}`, and the `W₁` estimate.
 6. (**N**) The exact discrepancies `8m` and `8(2m+1)` for general `m`, through the
@@ -129,12 +131,24 @@ question for torsion-free groups.
 | `WeightedTarget ⇒ μ_A|_{ℝ∖{0}} ≪ dE` | `muA_off_zero_ac` | C |
 | `WeightedTarget ∧ NoAtomTarget ⇒ μ_A ≪ dE`; same with `EnergyGrowthTarget` | `muA_ac_of_weighted`, `muA_ac_of_weighted_energy` | C |
 | `PrincipalTarget ⇒ EnergyGrowthTarget`, `PrincipalTarget ⇒ μ_A ≪ dE` | `energyGrowth_of_principal`, `muA_ac_of_principal` | C |
-| `μ_A{0} = 0` (Linnell's theorem on the Atiyah conjecture, or Harper DOS continuity) | — | **P**/**N** |
-| The weighted target itself | — | **P** |
+| `ν = (E²/16)μ` with `∑ d_n² < ∞`: `μ|_{ℝ∖{0}} = h dE`, `h ∈ L²([a,b])` for `[a,b] ⊂ (−4,4)∖{0}` | `exists_lebesgue_density_off_zero`, `ThomConclusions.muA_off_zero_local_L2` | C |
+| **Duality criterion**: `abs(∫P(E/4)dμ) ≤ K‖P(·/4)‖_{L^q(ρ)}` for all polynomials (`q ≥ 1`) ⇒ `μ ≪ dE` (Weierstrass, Urysohn, regularity) | `ThomChebyshev.ac_of_poly_Lq_bound` | C |
+| `LqTarget q ⇒ μ_A ≪ dE`; `PrincipalTarget ⇒ LqTarget 2` | `ThomConclusions.muA_ac_of_LqTarget`, `lqTarget_two_of_principal` | C |
+| `μ_A{0} = 0` (in the literature: Linnell's theorem on the Atiyah conjecture, or continuity of the Harper density of states) | — | **P** here, **N** |
+| The weighted target itself | — | **P** (numerics now argue against it, see below) |
+| `LqTarget q` for some `q > 2` (an `L^p` density, `p < 2`) | — | **P** (numerically plausible) |
 
 ### Numerical evidence (see `numerics/README.md`)
 
-Exact and stable computations of `τ(T_n(A/4))` for `n ≤ 170` suggest `c_n² ≍ 1/n`. The partial
+Round 3 (`n ≤ 256`, see `numerics/README.md`): the weighted block energy `∑_{[128,256)} d_n²`
+is more than twice the one on `[64,128)`, and the smoothed densities develop growing peaks near
+`E ≈ ±0.72, ±1.95, ±2.57`, close to band edges of the flux-`1/3` Harper operator. So the
+weighted `L²` target is **not** supported by the data, even though its partial sums look
+flat. Smoothed `L^p` norms for `p ≤ 1.75` do look bounded, which favours the `L^q` duality
+target with `q > 2`. The atom estimates (Cesàro means, Christoffel bounds) decay like
+`n^{-1/2}`, consistent with `μ_A{0} = 0`. All of this is heuristic.
+
+Round 2: exact and stable computations of `τ(T_n(A/4))` for `n ≤ 170` suggest `c_n² ≍ 1/n`. The partial
 sums grow like `0.054·log n`, and the excess comes from a concentration of `μ_A` at `E = 0`.
 If this persists, **the principal target is false**: `μ_A` would have no `L²(arcsine)` density
 (by `principalTarget_iff_L2`). This is heuristic, and it does not decide absolute continuity
@@ -159,7 +173,8 @@ ThomLean/Chebyshev/Weighted.lean   weighted measure E²/16·μ, three-term ident
 ThomLean/Chebyshev/Atom.lean       Cesàro atom formula, energy-growth criterion
 ThomLean/WeightedBridge.lean       WeightedTarget, flux reformulation, Christoffel bound
 ThomLean/Existence.lean            finite quotients H₃(ℤ/N), spectral measures, existence of μ_A
-ThomLean/Conclusions.lean          consequences for μ_A
+ThomLean/Chebyshev/Duality.lean    L^q duality criterion for absolute continuity
+ThomLean/Conclusions.lean          consequences for μ_A, L^q targets
 Audit.lean                         #print axioms for all principal theorems
 numerics/                          scripts and data (not part of the proofs)
 ```
