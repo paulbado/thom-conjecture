@@ -251,3 +251,7 @@ open ThomChebyshev ThomHeisenberg ThomReductions ThomBridge
 #print axioms ThomZeroLevel.not_lqTarget
 #print axioms ThomZeroLevel.not_fejerTarget
 #print axioms ThomZeroLevel.qm_exp_bound
+#print axioms ThomZeroLevel.not_integrable_mul_log_sq
+#print axioms ThomDirichlet.sum_mul_log_sum_le
+#print axioms ThomDirichlet.eig_proportional
+#print axioms ThomDirichlet.eig_eq_zero_of_first

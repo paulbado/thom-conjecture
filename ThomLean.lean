@@ -29,3 +29,6 @@ import ThomLean.ZeroLevel.Quasimode
 import ThomLean.ZeroLevel.Trig
 import ThomLean.ZeroLevel.Family
 import ThomLean.ZeroLevel.LogSq
+import ThomLean.ZeroLevel.Orlicz
+import ThomLean.Dirichlet.Coarea
+import ThomLean.Dirichlet.Simple
