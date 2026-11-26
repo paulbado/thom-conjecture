@@ -526,17 +526,20 @@ theorem map_eq_muA_of_mapClusterPt (s : ℕ → ℕ) (hs : ∀ n, n ≤ s n) (ν
     rw [integral_map measurable_subtype_coe.aemeasurable (by fun_prop)]
     exact hmom k
 
-/-- **Quantitative atom bound**: `μ_A{E} ≤ 2/L` for every `L ≥ 1`. -/
-theorem muA_singleton_le (E : ℝ) (L : ℕ) (hL : 0 < L) : muA.real {E} ≤ 2 / L := by
-  have hprob := isSpectralMeasureA_muA.isProb
+/-- The tent function of half-width `h` centred at `E`. -/
+def tent (E h x : ℝ) : ℝ := max 0 (1 - |x - E| / h)
+
+lemma continuous_tent (E h : ℝ) : Continuous (tent E h) :=
+  continuous_const.max (continuous_const.sub
+    ((continuous_id.sub continuous_const).abs.div_const h))
+
+/-- **Window bound for `μ_A`**: `∫ tent_{E,h_L} dμ_A ≤ 2/L`. -/
+theorem muA_tent_le (E : ℝ) (L : ℕ) (hL : 0 < L) : ∫ x, tent E (width L E) x ∂muA ≤ 2 / L := by
   have : NeZero L := ⟨hL.ne'⟩
   set h := width L E
   have hh : 0 < h := width_pos L hL E
-  set g : ℝ → ℝ := fun x => max 0 (1 - |x - E| / h) with hgdef
-  have hg : Continuous g := by
-    simp only [hgdef]
-    exact continuous_const.max (continuous_const.sub
-      ((continuous_id.sub continuous_const).abs.div_const h))
+  set g : ℝ → ℝ := tent E h with hgdef
+  have hg : Continuous g := continuous_tent E h
   have hg0 : ∀ x, 0 ≤ g x := fun x => le_max_left _ _
   have hg1 : ∀ x, g x ≤ 1 := fun x =>
     max_le zero_le_one (by have := div_nonneg (abs_nonneg (x - E)) hh.le; linarith)
@@ -544,7 +547,6 @@ theorem muA_singleton_le (E : ℝ) (L : ℕ) (hL : 0 < L) : muA.real {E} ≤ 2 /
     apply max_eq_left
     have : 1 < |x - E| / h := (one_lt_div hh).mpr hx
     linarith
-  have hgE : g E = 1 := by simp [hgdef]
   set s : ℕ → ℕ := fun n => L * (n + 1) - 1 with hsdef
   have hs1 : ∀ n, s n + 1 = L * (n + 1) := fun n =>
     Nat.sub_add_cancel (Nat.one_le_iff_ne_zero.mpr (Nat.mul_ne_zero hL.ne' n.succ_ne_zero))
@@ -564,19 +566,51 @@ theorem muA_singleton_le (E : ℝ) (L : ℕ) (hL : 0 < L) : muA.real {E} ≤ 2 /
     exact this
   have hν2 := integral_le_of_mapClusterPt _ ν hν' f _ hbound
   have hmu := map_eq_muA_of_mapClusterPt s hs ν hν'
-  have hint : ∫ x, g x ∂muA ≤ 2 / L := by
-    rw [← hmu, integral_map measurable_subtype_coe.aemeasurable hg.aestronglyMeasurable]
-    exact hν2
+  rw [← hmu, integral_map measurable_subtype_coe.aemeasurable hg.aestronglyMeasurable]
+  exact hν2
+
+/-- **Quantitative atom bound**: `μ_A{E} ≤ 2/L` for every `L ≥ 1`. -/
+theorem muA_singleton_le (E : ℝ) (L : ℕ) (hL : 0 < L) : muA.real {E} ≤ 2 / L := by
+  have hprob := isSpectralMeasureA_muA.isProb
+  have hg := continuous_tent E (width L E)
   calc muA.real {E} = ∫ x, ({E} : Set ℝ).indicator 1 x ∂muA :=
         (integral_indicator_one (measurableSet_singleton E)).symm
-    _ ≤ ∫ x, g x ∂muA := by
+    _ ≤ ∫ x, tent E (width L E) x ∂muA := by
         refine integral_mono ((integrable_indicator_iff (measurableSet_singleton E)).mpr
           (integrableOn_const (measure_ne_top _ _)))
           (integrable_of_continuous isSpectralMeasureA_muA.carried hg) fun x => ?_
         by_cases hx : x = E
-        · subst hx; simp [hgE]
-        · simp [hx, hg0 x]
-    _ ≤ _ := hint
+        · subst hx; simp [tent]
+        · simp [hx, tent]
+    _ ≤ _ := muA_tent_le E L hL
+
+/-- **Modulus of continuity**: `μ_A([E - h_L/2, E + h_L/2]) ≤ 4/L`, `h_L = 1/(L·Dᴸ)`. Since
+`h_L ≥ e^{-cL}` (for `E` in a bounded set), this is `μ_A(I) ≲ 1/log(1/|I|)`. -/
+theorem muA_Icc_le (E : ℝ) (L : ℕ) (hL : 0 < L) :
+    muA.real (Icc (E - width L E / 2) (E + width L E / 2)) ≤ 4 / L := by
+  have hprob := isSpectralMeasureA_muA.isProb
+  set h := width L E
+  have hh : 0 < h := width_pos L hL E
+  have hg := continuous_tent E h
+  have hint := integrable_of_continuous isSpectralMeasureA_muA.carried hg
+  calc muA.real (Icc (E - h / 2) (E + h / 2))
+      = ∫ x, (Icc (E - h / 2) (E + h / 2)).indicator 1 x ∂muA :=
+        (integral_indicator_one measurableSet_Icc).symm
+    _ ≤ ∫ x, 2 * tent E h x ∂muA := by
+        refine integral_mono ((integrable_indicator_iff measurableSet_Icc).mpr
+          (integrableOn_const (measure_ne_top _ _))) (hint.const_mul 2) fun x => ?_
+        by_cases hx : x ∈ Icc (E - h / 2) (E + h / 2)
+        · rw [indicator_of_mem hx]
+          have habs : |x - E| ≤ h / 2 := abs_le.mpr ⟨by linarith [hx.1], by linarith [hx.2]⟩
+          have : |x - E| / h ≤ 1 / 2 := by rw [div_le_iff₀ hh]; linarith
+          simp only [Pi.one_apply, tent]
+          have := le_max_right 0 (1 - |x - E| / h)
+          linarith
+        · rw [indicator_of_notMem hx]
+          exact mul_nonneg zero_le_two (le_max_left _ _)
+    _ = 2 * ∫ x, tent E h x ∂muA := integral_const_mul _ _
+    _ ≤ 2 * (2 / L) := by linarith [muA_tent_le E L hL]
+    _ = 4 / L := by ring
 
 /-- **`μ_A` has no atoms** (unconditional). -/
 theorem muA_no_atoms (E : ℝ) : muA {E} = 0 := by
