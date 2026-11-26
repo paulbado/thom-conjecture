@@ -1,1 +1,11 @@
 import ThomLean.Chebyshev
+import ThomLean.Chebyshev.Arcsine
+import ThomLean.Chebyshev.Criterion
+import ThomLean.Chebyshev.Lebesgue
+import ThomLean.Heisenberg.Group
+import ThomLean.Heisenberg.Moments
+import ThomLean.Heisenberg.Isoperimetric
+import ThomLean.Heisenberg.Threshold
+import ThomLean.Heisenberg.Examples
+import ThomLean.Reductions.Collision
+import ThomLean.Bridge

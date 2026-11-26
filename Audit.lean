@@ -1,0 +1,54 @@
+import ThomLean
+/-! Axiom audit: run `lake env lean Audit.lean`. Every theorem must depend only on
+`propext`, `Classical.choice`, `Quot.sound`. -/
+open ThomChebyshev ThomHeisenberg ThomReductions ThomBridge
+#print axioms ThomChebyshev.weightedEnergy_le_squareEnergy
+#print axioms ThomChebyshev.weighted_not_imp_L2
+#print axioms ThomChebyshev.integral_arcsine_eq_cos
+#print axioms ThomChebyshev.integral_cheb_mul_cheb_of_ne
+#print axioms ThomChebyshev.integral_cheb_zero_sq
+#print axioms ThomChebyshev.integral_cheb_sq_of_ne_zero
+#print axioms ThomChebyshev.orthonormal_chebL2
+#print axioms ThomChebyshev.mem_span_T
+#print axioms ThomChebyshev.chebL2_span_dense
+#print axioms ThomChebyshev.chebBasis
+#print axioms ThomChebyshev.parseval
+#print axioms ThomChebyshev.eq_of_integral_cheb_eq
+#print axioms ThomChebyshev.exists_density_of_summable
+#print axioms ThomChebyshev.arcsine_eq_withDensity
+#print axioms ThomChebyshev.absolutelyContinuous_of_summable
+#print axioms ThomChebyshev.exists_lebesgue_density_of_summable
+#print axioms ThomHeisenberg.H3.x_mul_y
+#print axioms ThomHeisenberg.H3.z_central
+#print axioms ThomHeisenberg.H3.eq_one_of_pow_eq_one
+#print axioms ThomHeisenberg.evalWord_eq
+#print axioms ThomHeisenberg.evalWord_eq_one_iff
+#print axioms ThomHeisenberg.opA_pow
+#print axioms ThomHeisenberg.tau_opA_pow
+#print axioms ThomHeisenberg.fluxTrace_opA_pow
+#print axioms ThomHeisenberg.rootsOfUnity_filter
+#print axioms ThomHeisenberg.avg_fluxTrace_opA_pow
+#print axioms ThomHeisenberg.moment_le_fluxMoment
+#print axioms ThomHeisenberg.abs_area_le
+#print axioms ThomHeisenberg.sixteen_abs_area_le
+#print axioms ThomHeisenberg.kQ_eq_ceil
+#print axioms ThomHeisenberg.NQ_eq
+#print axioms ThomHeisenberg.moment_eq_fluxMoment
+#print axioms ThomHeisenberg.exists_walk_area_eq
+#print axioms ThomHeisenberg.moment_lt_fluxMoment_NQ
+#print axioms ThomReductions.integral_poisson
+#print axioms ThomReductions.box_le_pi_mul_poisson
+#print axioms ThomReductions.poisson_le_three_mul_shift
+#print axioms ThomReductions.collision_identity
+#print axioms ThomReductions.collision_bounds
+#print axioms ThomBridge.chebTrace_eq
+#print axioms ThomBridge.chebCoeff_eq_chebTrace
+#print axioms ThomBridge.spectral_unique
+#print axioms ThomBridge.summable_of_L2_density
+#print axioms ThomBridge.principalTarget_iff_L2
+#print axioms ThomBridge.ac_of_principalTarget
+#print axioms ThomBridge.fluxCheb_eq_chebTrace
+#print axioms ThomBridge.principalTarget_iff_uniform_flux
+#print axioms ThomHeisenberg.moment_six
+#print axioms ThomHeisenberg.discrepancy_Q1
+#print axioms ThomHeisenberg.discrepancy_Q2
