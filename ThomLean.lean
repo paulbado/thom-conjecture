@@ -9,3 +9,8 @@ import ThomLean.Heisenberg.Threshold
 import ThomLean.Heisenberg.Examples
 import ThomLean.Reductions.Collision
 import ThomLean.Bridge
+import ThomLean.Chebyshev.Weighted
+import ThomLean.Chebyshev.Atom
+import ThomLean.WeightedBridge
+import ThomLean.Existence
+import ThomLean.Conclusions

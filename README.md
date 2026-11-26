@@ -63,7 +63,7 @@ question for torsion-free groups.
 | Kernel-checked values `τ(A⁶) = 232`, `m₆^{(2)} = 256`; first discrepancies 8 (`Q=1²`) and 24 (`Q=1·2`) | `moment_six`, `discrepancy_Q1`, `discrepancy_Q2` | U |
 | General first discrepancy `8m` (`Q = m²`) and `8(2m+1)` (`Q = m(m+1)`) | — | **N** (equality case of the isoperimetric inequality; checked only for `m = 1`) |
 | Lower bound `2ℓ_Q` on the discrepancy at `N_Q` | — | **N** (only `> 0` is proved) |
-| Existence of the spectral measure `μ_A` (group von Neumann algebra) | — | **N** (uniqueness is proved: `spectral_unique`) |
+| Existence of the spectral measure `μ_A` (via finite quotients `H₃(ℤ/N)` and Prokhorov compactness, see §5) | `ThomExistence.exists_spectralMeasureA`, `muA` | U |
 | Identification of `τ_α` with the moments of the Harper density of states `ν_α` | — | **N** |
 | Absolute continuity of `μ^{(q)}` (Floquet theory), `W₁` rate `q^{-1/2}` (Jackson) | — | **N** |
 
@@ -99,11 +99,38 @@ question for torsion-free groups.
    `principalTarget_iff_uniform_flux`, `∃ K, ∀ Q ≥ 1, ∑_{n=1}^{N_Q−1} (∑_k [Xᵏ]T_n · 4⁻ᵏ · m_k^{(Q)})² ≤ K`.
 2. (**P**, the alternative target) `∃ p > 1, ∀ J ⋐ (−4,4), sup_{Q≥2} ‖P_{Q^{-1/3}} ∗ μ_Q‖_{L^p(J)} < ∞`.
    This is not formalized because `μ_Q` (the Harper density of states) is not constructed.
-3. (**N**) Existence of `μ_A` with `IsSpectralMeasureA μ_A`.
-4. (**N**) Harper/Floquet identification of `τ_{p/q}` with `ν_{p/q}`, absolute continuity of
+3. (**P**, the weighted target, §5) `∑_{n≥2} (c_{n-2}+2c_n+c_{n+2})² < ∞` (`WeightedTarget`).
+4. (**P**, the atom at zero, §5) `μ_A{0} = 0`, equivalently `NoAtomTarget`; implied by the
+   `EnergyGrowthTarget` `N⁻¹∑_{n<N} c_n² → 0`.
+5. (**N**) Harper/Floquet identification of `τ_{p/q}` with `ν_{p/q}`, absolute continuity of
    `μ^{(q)}`, and the `W₁` estimate.
-5. (**N**) The exact discrepancies `8m` and `8(2m+1)` for general `m`, through the
+6. (**N**) The exact discrepancies `8m` and `8(2m+1)` for general `m`, through the
    equality case of the isoperimetric inequality.
+
+## 5. Weighted measure, atom at zero, existence of `μ_A` (round 3)
+
+| Statement | Lean name | Status |
+|---|---|---|
+| `4X²T_m = T_{m+2} + 2T_m + T_{m-2}` in `ℝ[X]`, all `m ∈ ℤ` | `ThomChebyshev.four_X_sq_mul_T` | U |
+| `ν = (E²/16)μ`: `d_n = (c_{n-2}+2c_n+c_{n+2})/4` for `n ≥ 2`; `d_0 = (c_0+c_2)/2`, `d_1 = (3c_1+c_3)/4` | `chebCoeff_weighted`, `chebCoeff_weighted_zero`, `chebCoeff_weighted_one` | U |
+| Chebyshev criterion for arbitrary finite measures on `[-4,4]` | `ac_of_summable_finite` | C |
+| `μ|_{ℝ∖{0}} ≪ ν`, and `ν{0} = 0` always | `restrict_compl_zero_ac_weighted`, `weighted_singleton_zero` | U |
+| `∑ d_n² < ∞ ⇒ μ|_{ℝ∖{0}} ≪ dE`; with `μ{0} = 0`, `μ ≪ dE` | `ac_off_zero_of_weighted_summable`, `ac_of_weighted_summable` | C |
+| Old `L²` condition ⇒ weighted condition | `weighted_summable_of_summable`, `ThomBridge.weightedTarget_of_principalTarget` | C |
+| `WeightedTarget ⇔` uniform bound on finite rational-flux weighted energies `∑_{n<N_Q−4}` | `ThomBridge.weightedTarget_iff_uniform_flux` | U |
+| **Atom formula** `μ{0} = lim (N+1)⁻¹ ∑_{j≤N} (−1)^j c_{2j}` (telescoping `4X²S_N = 1+T_2+(−1)^N(T_{2N}+T_{2N+2})` plus dominated convergence) | `four_X_sq_mul_altSum`, `tendsto_atomMean`, `atom_eq_zero_iff` | U |
+| `N⁻¹∑_{n<N} c_n² → 0 ⇒ μ{0} = 0` (Cauchy–Schwarz) | `atom_eq_zero_of_energy` | C |
+| Christoffel bound `μ{0} ≤ τ(p(A/4)²)` for every `p` with `p(0)=1` | `ThomBridge.atom_le_tau`, `ThomConclusions.muA_atom_le` | U |
+| Schreier graph of `H₃(ℤ/N)`: `(Aᵏ)_{pq}` counts words, `A` symmetric, eigenvalues in `[-4,4]` | `ThomExistence.adj_pow_apply`, `adj_symm`, `abs_eigenvalues_le` | U |
+| Finite spectral measure `∑_j U_{pj}² δ_{λ_j}` has moments `(Aᵏ)_{pp}` | `adj_pow_diag`, `integral_pow_specMeasure` | U |
+| `(k+1)² ≤ N`: a word of length `k` is trivial in `H₃(ℤ/N)` iff trivial in `H₃(ℤ)`, so the moments are exactly `τ(Aᵏ)` | `castH_evalWord_eq_zero_iff`, `quot_adj_pow`, `integral_pow_quotMeasure` | U |
+| **Existence**: a cluster point in the compact space `ProbabilityMeasure [-4,4]` is a spectral measure; `μ_A` is canonical | `exists_spectralMeasureA`, `muA`, `isSpectralMeasureA_iff` | U |
+| `μ_A{0} = lim (N+1)⁻¹∑(−1)^j τ(T_{2j}(A/4))` | `ThomConclusions.muA_atom_tendsto`, `noAtomTarget_iff` | U |
+| `WeightedTarget ⇒ μ_A|_{ℝ∖{0}} ≪ dE` | `muA_off_zero_ac` | C |
+| `WeightedTarget ∧ NoAtomTarget ⇒ μ_A ≪ dE`; same with `EnergyGrowthTarget` | `muA_ac_of_weighted`, `muA_ac_of_weighted_energy` | C |
+| `PrincipalTarget ⇒ EnergyGrowthTarget`, `PrincipalTarget ⇒ μ_A ≪ dE` | `energyGrowth_of_principal`, `muA_ac_of_principal` | C |
+| `μ_A{0} = 0` (Linnell's theorem on the Atiyah conjecture, or Harper DOS continuity) | — | **P**/**N** |
+| The weighted target itself | — | **P** |
 
 ### Numerical evidence (see `numerics/README.md`)
 
@@ -128,6 +155,11 @@ ThomLean/Heisenberg/Threshold.lean N_Q, moment matching, sharpness
 ThomLean/Heisenberg/Examples.lean  kernel-checked small values
 ThomLean/Reductions/Collision.lean Poisson kernel, collision identity
 ThomLean/Bridge.lean               τ(T_n(A/4)), target equivalences
+ThomLean/Chebyshev/Weighted.lean   weighted measure E²/16·μ, three-term identity, off-zero criterion
+ThomLean/Chebyshev/Atom.lean       Cesàro atom formula, energy-growth criterion
+ThomLean/WeightedBridge.lean       WeightedTarget, flux reformulation, Christoffel bound
+ThomLean/Existence.lean            finite quotients H₃(ℤ/N), spectral measures, existence of μ_A
+ThomLean/Conclusions.lean          consequences for μ_A
 Audit.lean                         #print axioms for all principal theorems
 numerics/                          scripts and data (not part of the proofs)
 ```
