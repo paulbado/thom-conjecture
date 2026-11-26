@@ -23,3 +23,9 @@ import ThomLean.DyadicTarget
 import ThomLean.Chebyshev.Entropy
 import ThomLean.WeightedL2
 import ThomLean.LowerBound
+import ThomLean.ZeroLevel.Count
+import ThomLean.ZeroLevel.Chain
+import ThomLean.ZeroLevel.Quasimode
+import ThomLean.ZeroLevel.Trig
+import ThomLean.ZeroLevel.Family
+import ThomLean.ZeroLevel.LogSq
