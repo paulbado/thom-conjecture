@@ -26,6 +26,10 @@ torsion-free groups.
 * **Chebyshev analysis.** Orthonormal basis of `L²(arcsine)`, Parseval, uniqueness from moments,
   the `L²` criterion and its converse, a weighted criterion away from `0`, an exact formula for
   the atom at `0`, and an `L^q` duality criterion for absolute continuity.
+* **`μ_A` has no atoms (unconditional).** `ThomNoAtoms.muA_no_atoms : ∀ E, muA {E} = 0`, with the
+  quantitative bound `muA_singleton_le : μ_A{E} ≤ 2/L` for every `L ≥ 1`. The proof is a
+  unique-continuation estimate along the rows of `H₃(ℤ/N)`, an eigenvalue count, vertex
+  transitivity and a passage to the limit; it uses no Chebyshev summability target.
 * **Conditional absolute continuity.** Each open target below implies `μ_A ≪ Lebesgue`
   (`ThomConclusions.muA_ac_of_principal`, `muA_ac_of_weighted`, `muA_ac_of_LqTarget`).
 
@@ -33,9 +37,11 @@ torsion-free groups.
 
 | Target | Lean name | Consequence proved in Lean | Numerical status |
 |---|---|---|---|
-| `∑ τ(T_n(A/4))² < ∞` | `ThomBridge.PrincipalTarget` | `μ_A ≪ dE` with `L²(arcsine)` density (equivalence) | likely false (log growth) |
-| `∑ (c_{n-2}+2c_n+c_{n+2})² < ∞` | `ThomBridge.WeightedTarget` | `μ_A` off `0` is a.c. with locally `L²` density | doubtful (block energy grows on `[128,256)`) |
-| `μ_A{0} = 0` | `ThomConclusions.NoAtomTarget` | with the weighted target, `μ_A ≪ dE` | supported (estimates `≈ n^{-1/2}`) |
+| `∑ τ(T_n(A/4))² < ∞` | `ThomBridge.PrincipalTarget` | `μ_A ≪ dE` with `L²(arcsine)` density (equivalence) | inconclusive (partial sums still growing at `n = 256`) |
+| `∑ (c_{n-2}+2c_n+c_{n+2})² < ∞` | `ThomBridge.WeightedTarget` | **alone** gives `μ_A ≪ dE` (`ThomNoAtoms.muA_ac_of_weightedTarget`) | inconclusive (block energy on `[128,256)` larger than on `[64,128)`) |
+
+`ThomConclusions.NoAtomTarget` (`μ_A{0} = 0`) is no longer open: it is proved as
+`ThomNoAtoms.noAtomTarget`.
 | `abs τ(P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}`, some `q > 2` | `ThomConclusions.LqTarget` | `μ_A ≪ dE`, no atom hypothesis | plausible (`L^p` norms, `p ≤ 1.75`, look bounded) |
 
 ## Verification
@@ -87,6 +93,7 @@ The live status of every module is in the summary of the latest workflow run.
 | `ThomLean.Existence` | `ThomLean/Existence.lean` | ✅ passing | 27 | 11 |
 | `ThomLean.Conclusions` | `ThomLean/Conclusions.lean` | ✅ passing | 14 | 13 |
 | `ThomLean.Chebyshev.Duality` | `ThomLean/Chebyshev/Duality.lean` | ✅ passing | 2 | 1 |
+| `ThomLean.NoAtoms` | `ThomLean/NoAtoms.lean` | ✅ passing | 36 | 22 |
 
 | File | Content |
 |---|---|
@@ -107,6 +114,7 @@ The live status of every module is in the summary of the latest workflow run.
 | `ThomLean/WeightedBridge.lean` | weighted target, flux reformulation, Christoffel bound |
 | `ThomLean/Existence.lean` | finite quotients `H₃(ℤ/N)`, existence of `μ_A` |
 | `ThomLean/Conclusions.lean` | consequences for `μ_A`, `L^q` targets |
+| `ThomLean/NoAtoms.lean` | unconditional absence of atoms of `μ_A` |
 | `Audit.lean` | `#print axioms` for the principal theorems |
 | `numerics/` | Python scripts and data, not part of the proofs |
 
@@ -233,9 +241,32 @@ The live status of every module is in the summary of the latest workflow run.
 | `ν = (E²/16)μ` with `∑ d_n² < ∞`: `μ|_{ℝ∖{0}} = h dE`, `h ∈ L²([a,b])` for `[a,b] ⊂ (−4,4)∖{0}` | `exists_lebesgue_density_off_zero`, `ThomConclusions.muA_off_zero_local_L2` | C |
 | **Duality criterion**: `abs(∫P(E/4)dμ) ≤ K‖P(·/4)‖_{L^q(ρ)}` for all polynomials (`q ≥ 1`) ⇒ `μ ≪ dE` (Weierstrass, Urysohn, regularity) | `ThomChebyshev.ac_of_poly_Lq_bound` | C |
 | `LqTarget q ⇒ μ_A ≪ dE`; `PrincipalTarget ⇒ LqTarget 2` | `ThomConclusions.muA_ac_of_LqTarget`, `lqTarget_two_of_principal` | C |
-| `μ_A{0} = 0` (in the literature: Linnell's theorem on the Atiyah conjecture, or continuity of the Harper density of states) | — | **P** here, **N** |
-| The weighted target itself | — | **P** (numerics now argue against it, see below) |
+| `μ_A{0} = 0`: now proved, see §6 | `ThomNoAtoms.noAtomTarget` | U |
+| The weighted target itself | — | **P** (numerics inconclusive) |
 | `LqTarget q` for some `q > 2` (an `L^p` density, `p < 2`) | — | **P** (numerically plausible) |
+
+### 6. No atoms (round 4, `ThomLean/NoAtoms.lean`)
+
+| Statement | Lean name | Status |
+|---|---|---|
+| Orthonormal eigenvector combinations: `‖∑_{j∈J} β_j u_j‖² = ∑ β_j²`, `A ∑ β_j u_j = ∑ λ_j β_j u_j` | `sum_sq_comb`, `adj_mulVec_comb` | U |
+| **Eigenvalue counting**: if `‖v‖² ≤ K‖(A−λ)v‖²` for all `v` vanishing on `S` and `Kh² < 1`, then `#{j : abs(λ_j − λ) ≤ h} ≤ #S` | `card_near_le` | U |
+| `∑_p σ_p(g) ≤ #{j : abs(λ_j − λ) ≤ h}` for `g ≤ 1` vanishing off `[λ−h, λ+h]` | `sum_integral_le` | U |
+| **Vertex transitivity** of the Schreier graph of `H₃(ℤ/N)` (left multiplication commutes with the right action): `(Aᵏ)_{pp} = (Aᵏ)_{00}`, all `σ_p` coincide | `quot_adj_pow_diag`, `specMeasure_map_eq` | U |
+| **Row recurrence**: `e(a+1) ≤ (5λ²+15)(ρ(a) + e(a) + e(a−1))`, with `e`, `ρ` the row energies of `v` and `(A−λ)v` | `rowE_succ_le` | U |
+| **Unique continuation**: `v = 0` on the rows `a ≡ 0, −1 (mod L)` ⇒ `‖v‖² ≤ L·Dᴸ‖(A−λ)v‖²`, `D = 3(5λ²+15)` | `rowE_block`, `rowE_le`, `uniqueCont` | U |
+| `#{a ∈ ℤ/N : a ≡ t (mod L)}·L = N`; `#S·L ≤ 2N³` | `card_fiber_mul`, `card_Srows_le` | U |
+| **Uniform window bound**: `L ∣ N` ⇒ `∫ g dσ_N ≤ 2/L` for `g ≤ 1` vanishing off `[λ−h_L, λ+h_L]`, `h_L = 1/(L·Dᴸ)` | `quot_integral_le` | U |
+| Cluster points of `σ_{s(n)}` are `μ_A`; bounds pass to cluster points | `map_eq_muA_of_mapClusterPt`, `integral_le_of_mapClusterPt` | U |
+| **`μ_A{E} ≤ 2/L` for all `L ≥ 1`, hence `μ_A{E} = 0` for every `E`**; countable sets are null | `muA_singleton_le`, `muA_no_atoms`, `muA_countable` | U |
+| `NoAtomTarget` holds; `WeightedTarget ⇒ μ_A ≪ dE` | `noAtomTarget`, `muA_ac_of_weightedTarget` | U / C |
+
+The argument is elementary and self-contained, in the spirit of the "no eigenvalues for
+amenable Cayley graphs with finite quotients" arguments: the row recurrence plays the role of
+unique continuation, and the rows `a ≡ 0, −1 (mod L)` form a set of density `2/L` whose removal
+forces any approximate eigenvector to be small. The window `h_L` shrinks exponentially in `L`;
+this is enough for atoms, but gives no modulus of continuity better than
+`μ_A([E−h, E+h]) ≲ 1/log(1/h)`, far from absolute continuity.
 
 ## Numerical evidence (see `numerics/README.md`)
 

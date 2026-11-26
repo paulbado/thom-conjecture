@@ -15,3 +15,4 @@ import ThomLean.WeightedBridge
 import ThomLean.Existence
 import ThomLean.Conclusions
 import ThomLean.Chebyshev.Duality
+import ThomLean.NoAtoms
