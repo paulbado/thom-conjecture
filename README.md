@@ -47,9 +47,17 @@ torsion-free groups.
   WeightedLqTarget 2 ↔ WeightedTarget`. Localization: `μ_A ≪ dE` iff its restrictions to
   `{abs E ≥ ε}` are absolutely continuous (`muA_ac_iff_local`).
 * **Lower bounds at `0` (round 5).** `ThomLowerBound.le_measureReal_of_moments` transfers lower
-  bounds on compact sets from moment-matching approximants (such as the rational-flux averages)
-  to `μ_A`; `not_lqTarget_of_logSq` shows that `μ_A([−h,h]) ≥ c/log²(1/h)` would refute every
-  `LqTarget q`, every Fejér `L^p` target and `PrincipalTarget`. The lower bound itself is open.
+  bounds on compact sets from moment-matching approximants to `μ_A`; `not_lqTarget_of_logSq`
+  shows that `μ_A([−h,h]) ≥ c/log²(1/h)` refutes every `LqTarget q`, every Fejér `L^p` target
+  and `PrincipalTarget`.
+* **The logarithmic lower bound at `0` (round 6, unconditional).**
+  `ThomZeroLevel.logSqLowerBound : LogSqLowerBound`, i.e. `μ_A([−h,h]) ≥ c/log²(1/h)` for
+  `0 < h < 1/3` with the explicit `c = 1/165888000`. The proof uses explicit zero-energy
+  quasimodes of the chiral (zero-diagonal) Jacobi operator at flux `1/2 + δ`, embedded in the
+  finite quotients `H₃(ℤ/N)`, and a Riemann sum over fluxes (§9). Consequently
+  `ThomZeroLevel.not_principalTarget`, `not_lqTarget` (every `q ≥ 1`) and `not_fejerTarget`
+  (every `p > 1`): **these targets are false.** Absolute continuity of `μ_A` and the weighted
+  targets are not affected.
 * **Conditional absolute continuity.** Each open target below implies `μ_A ≪ Lebesgue`
   (`ThomConclusions.muA_ac_of_principal`, `ThomNoAtoms.muA_ac_of_weightedTarget`,
   `ThomConclusions.muA_ac_of_LqTarget`, `ThomFejer.muA_ac_of_fejerTarget`,
@@ -59,25 +67,23 @@ torsion-free groups.
 
 | Target | Lean name | Consequence proved in Lean | Numerical status |
 |---|---|---|---|
-| `∑ τ(T_n(A/4))² < ∞` | `ThomBridge.PrincipalTarget` | `μ_A ≪ dE` with `L²(arcsine)` density (equivalence) | numerically false (mass `≈ 0.47/log²(1/h)` at `0`, see below) |
+| `∑ τ(T_n(A/4))² < ∞` | `ThomBridge.PrincipalTarget` | `μ_A ≪ dE` with `L²(arcsine)` density (equivalence) | **false** (Lean: `ThomZeroLevel.not_principalTarget`) |
 | `∑ (c_{n-2}+2c_n+c_{n+2})² < ∞` | `ThomBridge.WeightedTarget` | **alone** gives `μ_A ≪ dE` (`ThomNoAtoms.muA_ac_of_weightedTarget`); **equivalent** to `WeightedLqTarget 2` (`ThomWeightedL2.weightedLqTarget_two_iff`) | inconclusive: binned weighted `L²` energy converged in `Q` up to `2⁹` angular cells, growing `≈ 0.003` per level there |
-| `sup_N ∫ abs(F_N)^p dρ < ∞`, `p > 1` (Fejér densities) | `ThomFejer.FejerTarget` | `μ_A ≪ dE`; `p = 3/2` gives `LqTarget 3` | numerically false for every `p > 1` (same reason) |
+| `sup_N ∫ abs(F_N)^p dρ < ∞`, `p > 1` (Fejér densities) | `ThomFejer.FejerTarget` | `μ_A ≪ dE`; `p = 3/2` gives `LqTarget 3` | **false** for every `p > 1` (Lean: `ThomZeroLevel.not_fejerTarget`) |
 | `abs τ((A/4)² P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}` | `ThomFejer.WeightedLqTarget` | with `muA_no_atoms`, `μ_A ≪ dE`; `q = 2` is `WeightedTarget` | compatible with the exact flux averages for `q ≥ 2` |
-| `abs τ(P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}`, some `q < ∞` | `ThomConclusions.LqTarget` | `μ_A ≪ dE`; forces `μ_A([−h,h]) = O(h^{1/q})` (`ThomFejer.muA_le_of_lqTarget`); refuted by `LogSqLowerBound` (`ThomLowerBound.not_lqTarget_of_logSq`) | numerically false for every `q < ∞` |
-| `sup_N ∫ F_N log F_N dρ < ∞` (Fejér entropy) | `ThomWeightedL2.FejerEntropyTarget` | `μ_A ≪ dE` (`muA_ac_of_fejerEntropyTarget`); implied by every `FejerTarget p` | **recommended**: compatible with a `1/(abs E log³)` profile at `0`; increments decay by `≈ 0.72` per doubling of `N` up to `N = 512` |
+| `abs τ(P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}`, some `q < ∞` | `ThomConclusions.LqTarget` | `μ_A ≪ dE`; forces `μ_A([−h,h]) = O(h^{1/q})` (`ThomFejer.muA_le_of_lqTarget`); refuted by `LogSqLowerBound` (`ThomLowerBound.not_lqTarget_of_logSq`) | **false** for every `q ≥ 1` (Lean: `ThomZeroLevel.not_lqTarget`) |
+| `sup_N ∫ F_N log F_N dρ < ∞` (Fejér entropy) | `ThomWeightedL2.FejerEntropyTarget` | `μ_A ≪ dE` (`muA_ac_of_fejerEntropyTarget`); implied by every `FejerTarget p` | **recommended**: not contradicted by the proved lower bound (a profile with `μ([−h,h]) ≍ 1/log²(1/h)` can have finite entropy); increments decay by `≈ 0.72` per doubling of `N` up to `N = 512` |
 | `∑_k D_k(λ) < ∞`, `λ = θ_*μ_A` (dyadic discrepancies) | `Summable (ThomDyadic.dyDisc ThomDyadicTarget.lam)` | `μ_A ≪ dE` (`ThomDyadicTarget.muA_ac_of_summable_dyDisc`) | undecided: `D_k ≈ 0.03–0.04` at the levels resolved by `Q ≤ 601` |
-| `μ_A([−h,h]) ≥ c/log²(1/h)` (a lower bound, not a regularity target) | `ThomLowerBound.LogSqLowerBound` | refutes `LqTarget q` (all `q ≥ 1`), `FejerTarget p` (all `p > 1`), `PrincipalTarget` | numerically true (`≈ 0.47/log²(1/h)`); certified only at `h ≈ 0.2` |
+| `μ_A([−h,h]) ≥ c/log²(1/h)` (a lower bound, not a regularity target) | `ThomLowerBound.LogSqLowerBound` | refutes `LqTarget q` (all `q ≥ 1`), `FejerTarget p` (all `p > 1`), `PrincipalTarget` | **proved** (`ThomZeroLevel.logSqLowerBound`, `c = 1/165888000`); numerically `≈ 0.47/log²(1/h)` |
 
 `ThomConclusions.NoAtomTarget` (`μ_A{0} = 0`) is no longer open: it is proved as
 `ThomNoAtoms.noAtomTarget`.
 
-"Numerically false" means: exact rational-flux averages `ν_Q` (`Q ≤ 293`, Chambers' formula,
-validated against the walk counts) give `ν_Q([−h,h]) · log²(1/h) ≈ 0.47` for
-`2⁻¹⁸ ≤ h ≤ 2⁻⁴`, stable in `Q`. The mechanism is the zero Landau level near flux `1/2`
-(`2|δ|q` bands within `e^{−0.3/|δ|}` of `0`). This is evidence, not a proof; a proof of the lower
-bound `μ_A([−h,h]) ≥ c/log²(1/h)` would refute these targets formally via
-`muA_le_of_lqTarget`. See `numerics/README.md`, round 4. Round 5 makes this implication a theorem
-(`ThomLowerBound.not_lqTarget_of_logSq`) and audits the transfer from `ν_Q` to `μ_A`: see §8.
+Rounds 2–5 found these three targets numerically false: the exact rational-flux averages
+`ν_Q` give `ν_Q([−h,h]) · log²(1/h) ≈ 0.47` for `2⁻¹⁸ ≤ h ≤ 2⁻⁴`, from the zero Landau level
+near flux `1/2`. Round 6 turns this into a proof (§9). The proved constant `c = 1/165888000` is
+far from the numerical `0.47`; the constants were not optimized. The lower bound says nothing
+about a density profile at `0`: no asymptotic for the density of `μ_A` near `0` is claimed.
 
 ## Verification
 
@@ -99,14 +105,14 @@ To reproduce locally:
 ```bash
 lake exe cache get                 # optional: download the Mathlib build cache
 lake build                         # compile everything
-scripts/check_axioms.sh audit.txt  # sorry / axiom scan + #print axioms on 195 theorems
+scripts/check_axioms.sh audit.txt  # sorry / axiom scan + #print axioms on 248 theorems
 scripts/module_status.sh           # per-module build table
 ```
 
 ### Status of each module
 
-Last local verification on commit `101c6cd`: full `lake build` succeeds (6376 jobs), 100 theorems
-audited, all depending only on `propext`, `Classical.choice`, `Quot.sound` (some only on `propext`).
+Last local verification (round 6, commit `d2b62c0`): full `lake build` succeeds (7248 jobs),
+248 theorems audited, all depending only on `propext`, `Classical.choice`, `Quot.sound`.
 The live status of every module is in the summary of the latest workflow run.
 
 | Module | File | Build | Theorems/lemmas | Audited in Audit.lean |
@@ -136,6 +142,12 @@ The live status of every module is in the summary of the latest workflow run.
 | `ThomLean.Chebyshev.Entropy` | `ThomLean/Chebyshev/Entropy.lean` | ✅ passing | 9 | 7 |
 | `ThomLean.WeightedL2` | `ThomLean/WeightedL2.lean` | ✅ passing | 9 | 8 |
 | `ThomLean.LowerBound` | `ThomLean/LowerBound.lean` | ✅ passing | 6 | 6 |
+| `ThomLean.ZeroLevel.Count` | `ThomLean/ZeroLevel/Count.lean` | ✅ passing | 13 | 9 |
+| `ThomLean.ZeroLevel.Chain` | `ThomLean/ZeroLevel/Chain.lean` | ✅ passing | 4 | 3 |
+| `ThomLean.ZeroLevel.Quasimode` | `ThomLean/ZeroLevel/Quasimode.lean` | ✅ passing | 14 | 12 |
+| `ThomLean.ZeroLevel.Trig` | `ThomLean/ZeroLevel/Trig.lean` | ✅ passing | 7 | 7 |
+| `ThomLean.ZeroLevel.Family` | `ThomLean/ZeroLevel/Family.lean` | ✅ passing | 12 | 11 |
+| `ThomLean.ZeroLevel.LogSq` | `ThomLean/ZeroLevel/LogSq.lean` | ✅ passing | 12 | 11 |
 
 | File | Content |
 |---|---|
@@ -164,6 +176,12 @@ The live status of every module is in the summary of the latest workflow run.
 | `ThomLean/Chebyshev/Entropy.lean` | Fejér relative entropy, uniform integrability, criterion, strictness |
 | `ThomLean/WeightedL2.lean` | `WeightedTarget ⇔ WeightedLqTarget 2`, localization, entropy target |
 | `ThomLean/LowerBound.lean` | transfer of lower bounds, `LogSqLowerBound ⇒ ¬LqTarget` |
+| `ThomLean/ZeroLevel/Count.lean` | eigenvalue counting from orthogonal complex quasimodes, `σ_N([−h,h]) = #{abs λ ≤ h}/N³` |
+| `ThomLean/ZeroLevel/Chain.lean` | chain vectors in `H₃(ℤ/N)`: intertwining with the chiral Jacobi operator, orthogonality |
+| `ThomLean/ZeroLevel/Quasimode.lean` | explicit quasimode, boundary residual identity, `‖Hξ‖² ≤ 16(4/9)^m‖ξ‖²` |
+| `ThomLean/ZeroLevel/Trig.lean` | bond moduli `2abs(cos)`, ratio bounds near flux `1/2` |
+| `ThomLean/ZeroLevel/Family.lean` | the quasimode family, disjoint bands, eigenvalue count, window counts |
+| `ThomLean/ZeroLevel/LogSq.lean` | Riemann sum, transfer, `logSqLowerBound`, refutations, Task 2 in exponential form |
 | `Audit.lean` | `#print axioms` for the principal theorems |
 | `numerics/` | Python scripts and data, not part of the proofs |
 
@@ -367,7 +385,7 @@ weighted bound, for example `WeightedLqTarget 2`: an `L²` (or `L^p`, `p > 1`) d
 | Local weighted `L²` bounds on `{abs E ≥ ε}` for each `ε` ⇒ `μ_A ≪ dE` | `muA_ac_of_local_weighted` | C |
 | **Transfer of lower bounds**: moment-matching approximants with `c ≤ ν_Q(C)` infinitely often give `c ≤ μ(C)` (`C` compact) | `ThomLowerBound.le_measureReal_of_moments`, `logSqLowerBound_of_approx` | U / C |
 | **`μ_A([−h,h]) ≥ c/log²(1/h)` refutes** every `LqTarget q` (`q ≥ 1`), every `FejerTarget p` (`p > 1`) and `PrincipalTarget` | `not_lqTarget_of_logSq`, `not_fejerTarget_of_logSq`, `not_principalTarget_of_logSq` | C |
-| `LogSqLowerBound` itself | `ThomLowerBound.LogSqLowerBound` | **P**, numerically true |
+| `LogSqLowerBound` itself | `ThomLowerBound.LogSqLowerBound` | **U** since round 6: `ThomZeroLevel.logSqLowerBound` (§9) |
 | `FejerEntropyTarget`, summable `D_k(λ)` | `ThomWeightedL2.FejerEntropyTarget` | **P**, open |
 
 **Why flux-wise estimates cannot suffice.** `D_k` and `H_k` are convex under mixtures
@@ -384,17 +402,112 @@ Lean theorem (the measures `N_α` are not formalized).
 121 exact moments, the Chebyshev–Markov–Stieltjes inequalities give the rigorous bound
 `μ_A((−0.196, 0.196)) ≥ 0.0696` (`numerics/gauss_lower.py`), which is far from the scales
 `h ≤ 2⁻⁴` of the log² law. Certifying `h = 2⁻¹⁸` that way would need moments of degree
-`≈ 3·10⁶`. The weak limit `ν_Q → μ_A` is the correct direction for lower bounds on compact sets
-(`le_measureReal_of_moments`), so a proof of `ν_Q([−h,h]) ≥ c/log²(1/h)` for infinitely many `Q`
+`≈ 3·10⁶`. *Correction (round 6).* Weak convergence `ν_Q → μ_A` (which holds, since the moments
+converge and `μ_A` is determined by its moments) gives `ν_Q(I) → μ_A(I)` for every interval `I`
+with `μ_A(∂I) = 0`, and `μ_A` is atomless (`muA_no_atoms`), so interval masses converge in
+**both** directions. The Lean theorem `le_measureReal_of_moments` proves the lower-bound
+direction on compact sets, which is the one `LogSqLowerBound` needs. So a proof of `ν_Q([−h,h]) ≥ c/log²(1/h)` for infinitely many `Q`
 at each fixed `h` (equivalently, of the zero-Landau-level estimate below for rational fluxes)
 would prove `LogSqLowerBound`. The missing estimate is:
 
 > **(ZL)** there are `c₀, δ₀ > 0` such that for every flux `α = 1/2 + δ`, `0 < abs δ < δ₀`, the
 > Harper density of states satisfies `N_α([−e^{−c₀/abs δ}, e^{−c₀/abs δ}]) ≥ abs δ`.
 
-(ZL) gives `μ_A([−h,h]) ≥ ∫_{abs δ ≤ c₀/log(1/h)} abs δ dδ = (c₀/log(1/h))²`. Semiclassical
-analysis near flux `1/2` (Helffer–Sjöstrand) and the gap labels `α`, `1 − α` around the zero
-band are the natural tools; neither is formalized here.
+(ZL) gives `μ_A([−h,h]) ≥ ∫_{abs δ ≤ c₀/log(1/h)} abs δ dδ = (c₀/log(1/h))²`. Round 6 proves a
+finite-volume form of (ZL) with explicit quasimodes and closes the argument (§9).
+
+### 9. The logarithmic lower bound at `0`, unconditionally (round 6, `ThomLean/ZeroLevel/…`)
+
+**Theorem** (`ThomZeroLevel.logSqLowerBound : LogSqLowerBound`). For `0 < h < 1/3`,
+`μ_A([−h, h]) ≥ c / log² h` with `c = 1/165888000`.
+
+**Corollaries** (U): `ThomZeroLevel.not_principalTarget`, `not_lqTarget (hq : 1 ≤ q)`,
+`not_fejerTarget (hp : 1 < p)`. `PrincipalTarget`, every `LqTarget q` (`q ≥ 1`) and every
+`FejerTarget p` (`p > 1`) are false. `WeightedTarget`, `WeightedLqTarget q`,
+`FejerEntropyTarget`, the dyadic target and absolute continuity of `μ_A` are untouched: the
+bound is compatible with all of them, and it gives no density asymptotic at `0`.
+
+The proof avoids infinite-dimensional spectral theory: it runs in the finite quotients
+`H₃(ℤ/N)` already used to construct `μ_A`, as allowed by the round-6 plan.
+
+| Step | Statement | Lean name | Status |
+|---|---|---|---|
+| 1 | **Finite chiral model.** For `N` odd, `ψ(x) = e^{2πix/N}`, `F^{p,t}_ξ(a,b,c) = ξ(−a−b) ψ(pc − pab + ta − p·a(a−1)/2)` satisfies `A F^{p,t}_ξ = F^{p,t}_{Hξ}`, where `(Hξ)(l) = c(l−1)ξ(l−1) + conj(c(l))ξ(l+1)`, `c(n) = 1 + ψ(t + p(n+1))`, `abs c(n) = 2 abs cos(π(t+p(n+1))/N)` | `ThomZeroLevel.cAdj_Fv`, `two_mul_half` | U |
+| 2 | **Orthogonality.** `⟨F^{p,t}_ξ, F^{p',t'}_η⟩ = N² [p=p'] [t=t'] ⟨ξ,η⟩` (character sums over `c` and `a`) | `ip_Fv`, `nrm_Fv` | U |
+| 3 | **Counting lemma.** Pairwise orthogonal complex vectors `F_i` with `A F_i` pairwise orthogonal and `‖AF_i‖² ≤ ε²‖F_i‖²`, `ε² < h²`, force `#{i} ≤ #{j : abs λ_j ≤ h}` (Parseval in the real eigenbasis plus a kernel-dimension argument) | `card_le_of_quasimodes`, `parseval`, `coef_cAdj`, `nrm_sum` | U |
+| 4 | **Spectral mass = eigenvalue count.** `σ_N([−h,h]) · N³ = #{j : abs λ_j ≤ h}` (vertex transitivity) | `quotMeasure_real_Icc`, `specMeasure_real` | U |
+| 5 | **Explicit quasimode.** `ξ = ∑_{j≤M} u_j δ_{s+2j}`, `u_0 = 1`, `u_{j+1} = −c_j u_j / conj(d_j)` (`c_j = c(s+2j)`, `d_j = c(s+2j+1)`). **Only the two exterior boundary sites carry residuals**: `Hξ = conj(c(s−1)) u_0 δ_{s−1} + c_M u_M δ_{s+2M+1}` | `chainH_qmXi` | U |
+| 6 | Growth `abs u_m ≥ (3/2)^m abs u_0` and decay `abs u_M ≤ (2/3)^m abs u_{M−m}` from the ratio bounds, hence `abs u_0², abs u_M² ≤ (4/9)^m ‖ξ‖²` and `‖Hξ‖² ≤ 16 (4/9)^m ‖ξ‖²`, `‖ξ‖² ≥ 1` | `qmU_growth`, `qmU_decay`, `qm_bound` | U |
+| 7 | **Trigonometry near half flux.** With `δ = val p/N − 1/2`, `θ = val(t+p(s+1))/N`: `abs c_j² = 4cos²(π(θ+2jδ))`, `abs d_j² = 4sin²(π(θ+(2j+1)δ))`. For `θ ∈ [1/16,1/8]`, `0 < δ ≤ 1/256`, `2mδ ≤ 1/32`, `2Mδ ≤ 11/32`, `9/32 ≤ 2(M−m+1)δ`: ratios `≥ 3/2` on the first `m` steps (phases in `[1/16, 5/32]`), `≤ 2/3` on the last `m` steps (phases in `[11/32 − 1/128, 15/32]`), all `d_j ≠ 0` | `normSq_ce`, `normSq_co`, `trig_first`, `trig_last`, `qm_of_phase` | U |
+| 7′ | **Task 2 as requested.** `m = ⌊1/(64δ)⌋`, `M = ⌊5/(32δ)⌋`, `0 < δ ≤ 2⁻¹⁰`: `‖Hξ‖² ≤ (1/4) e^{−2b/δ} ‖ξ‖²`, i.e. `‖Hξ‖ ≤ (1/2) e^{−b/δ} ‖ξ‖`, with **`b = 1/400`, `δ₀ = 2⁻¹⁰`** | `qm_exp_bound` | U |
+| 8 | **The family.** `M = 11m`, `D = 2M+3`, chains at `s_k = 1 + kD` in disjoint bands `[kD, (k+1)D)`, `k < N/D`; fluxes `val p/N ∈ [1/2 + 9/(640m), 1/2 + 1/(64m)]`; phases `θ ∈ [1/16, 1/8]`. All members are mutually orthogonal (different `(p,t)` by step 2, same `(p,t)` by disjoint bands), and so are their images | `good`, `fam`, `qmXi_band`, `chainH_band`, `card_good_le` | U |
+| 9 | **Riemann sum over fluxes.** `#family = #P · ⌊N/D⌋ · #T` (the phase condition is a translate in `t`), with `#P ≥ N/(640m) − 1`, `#T ≥ N/16 − 1`; so `σ_N([−h,h]) ≥ 1/(2048000 m²)` for all large odd `N` once `16(4/9)^m < h²` | `card_good`, `card_window`, `nuQ_lower`, `nuQ_lower_explicit` | U |
+| 10 | `m = ⌈5 + 3 log(1/h)⌉` gives `16(4/9)^m < h²` and `m ≤ 9 log(1/h)` for `h < 1/3` | `eps_lt`, `one_lt_log_three` | U |
+| 11 | **Transfer.** `σ_N` matches `μ_A` on every polynomial of degree `d` once `N > (d+1)²` (`nuQ_moments`); `logSqLowerBound_of_approx` (round 5) passes the bound to `μ_A` | `nuQ_moments`, `logSqLowerBound` | U |
+
+**Relation to the round-6 plan.** The plan's chiral representation on `ℓ²(ℤ)` and its
+phase/flux average (Jitomirskaya–Krasovsky, arXiv:1909.04429) are replaced by their exact
+finite-volume counterpart: the chain operator `H_{p,t}` on `ℤ/N` *is* the zero-diagonal Jacobi
+operator `(Ju)_n = a_{n−1}u_{n−1} + a_n u_{n+1}` at flux `p/N` and phase `t/N` up to a gauge
+(`abs c(n) = 2 abs cos(π(θ + nα))`), and the quasimode lives in a band of length `< N`, so it is
+the same finitely supported vector as on `ℤ`. The phase average over `θ ∈ [1/16, 1/8]` becomes
+the count over `t`, the flux integral over `δ` becomes the sum over `p`, and moment matching
+is the exact matching of the quotient measures (round 3) instead of a word expansion. The
+constants (`b = 1/400` instead of `1/384`, the factor `16` instead of `8`) differ from the plan
+only because the boundary residuals were bounded with `abs(z+w)² ≤ 2abs z² + 2abs w²`.
+
+**Task 3 note.** The plan's projection estimate (`⟨Pv,v⟩ ≥ 3/4`, summed over the sites of
+the chain) is replaced by the counting lemma of step 3, which needs no projection and gives one
+eigenvalue in `[−h,h]` per quasimode.
+
+#### Documentation corrections (round 6)
+
+* **Weak convergence and interval masses.** Earlier text said that weak convergence is "the
+  correct direction" for lower bounds on compact sets. That is true but incomplete: since the
+  approximants converge weakly to `μ_A` and `μ_A` is atomless (`muA_no_atoms`), every interval
+  is a `μ_A`-continuity set and `ν_Q(I) → μ_A(I)` for **every** interval. Lower *and* upper
+  bounds on interval masses pass to the limit. Lean proves the lower-bound direction on compact
+  sets (`le_measureReal_of_moments`), which is the one used.
+* **Finite-`Q` entropies are not upper bounds.** Round 5 called the unconverged finite-`Q`
+  dyadic and Fejér entropies "upper bounds on the limit". They are not automatically: for each
+  fixed level, `H_k(ν_Q) → H_k(μ_A)` (cell boundaries are null), but at fixed `Q` the value can
+  lie on either side of the limit. The observed decrease in `Q` is evidence only.
+* **No density asymptotic.** `LogSqLowerBound` is a lower bound on interval masses. It does not
+  give the behaviour of a density of `μ_A` at `0` (which is not even known to exist).
+
+#### Task 5: cross-flux averaging (evidence, no new theorem)
+
+`numerics/cross_flux.py` uses the decomposition of steps 1–2: for `N` prime and `p ≠ 0` the
+spectrum of `H_{p,t}` does not depend on `t`, so `σ_N = N⁻¹ ∑_p ν_p` is an explicit flux
+average of chain spectra. The exact moments are reproduced (`k ≤ 12`).
+
+* **Flux-window localization (exact inequality).** Fejér smoothing is linear and `x log x` and
+  `x²` are convex, so for any partition of the fluxes into windows `W_b`,
+  `Ent_K(σ) ≤ ∑_b w_b Ent_K(σ_b)` and `W_K(σ) ≤ ∑_b w_b W_K(σ_b)` (`σ_b` = average over `W_b`,
+  `W_K` = weighted Fejér energy of `(E/4)²σ`). The same holds for `μ_A = ∫ N_α dα` with flux
+  windows. Window width `1/N` is the flux-wise bound (which fails, §8); width `1` is the target
+  itself.
+* **Numbers** (`out_cross_flux_401.txt`, `out_cross_flux_1009.txt`; `K` up to `128`; only
+  degrees `≲ 2√N` are exact moments of `μ_A`, so large-`K` rows describe `σ_N`). The full
+  average has `Ent_K` increments per doubling of `K` of `0.096, 0.076, 0.055, 0.038` (ratio
+  `≈ 0.7`, as in round 5). With fixed windows of width `1/4` the increments are `0.13, 0.13,
+  0.10, 0.07`; with width `1/16` they are `0.16, 0.20, 0.19, 0.15`; flux-wise they grow
+  (`0.16, 0.23, 0.28, 0.32`). For the weighted energy `W_K` (`N = 1009`, `K ≤ 128`) the full
+  average grows by `0.024, 0.021, 0.016, 0.010`, windows of width `1/4` by `0.035, 0.040,
+  0.039, 0.028`, and the flux-wise bound by `0.044, 0.077, 0.126, 0.204`. So the window inequality is useful only with
+  windows of **non-shrinking** width; at these sizes no window of width `o(1)` keeps the bound
+  flat.
+* **Where the mass at `0` comes from.** The windows `abs(α − 1/2) ≤ 0.05` (10% of the fluxes)
+  carry 6% of `σ_N([−1/8,1/8])` but 37% of `σ_N([−2⁻¹⁰, 2⁻¹⁰])` (`N = 1009`), and the windows
+  `abs(α − a/4) ≤ 0.02` (`a = 1, 3`, 8% of the fluxes) carry 15%. `σ_N([−h,h])·log²(1/h)`
+  stays near `0.50` for `2⁻⁶ ≤ h ≤ 2⁻¹⁰`. This is consistent with even-denominator fluxes
+  (`q = 2, 4, …`, where `0` is in the spectrum) driving the concentration at `0`.
+
+**Status of Task 5.** `WeightedTarget` and `FejerEntropyTarget` remain open. The window
+inequality is the natural reduction: it would suffice to bound `Ent_K` (or `W_K`) of the flux
+averages over a fixed finite family of flux windows, uniformly in `K`. Near the
+even-denominator fluxes this needs the zero-level analysis of steps 5–9 with **upper** bounds
+on the number of near-zero eigenvalues, which is not done here.
 
 ## Numerical evidence (see `numerics/README.md`)
 

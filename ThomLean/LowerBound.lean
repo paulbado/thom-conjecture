@@ -7,9 +7,12 @@ import ThomLean.FejerTarget
   agree with `μ` on every polynomial (as the rational-flux averages `ν_Q` agree with `μ_A` in
   degree `< N_Q = 2⌈2√Q⌉`), then lower bounds on compact sets pass to the limit:
   `c ≤ ν_Q(C)` for infinitely many `Q` implies `c ≤ μ(C)`. Upper semicontinuity on compact
-  sets is the correct direction for a **lower** bound on `μ_A`.
-* `LogSqLowerBound`: `μ_A([-h,h]) ≥ c / log²(1/h)` for `0 < h < h₀`. This is the open estimate
-  of Task 1. It is **not** proved here; it is never assumed outside the hypotheses below.
+  sets is the correct direction for a **lower** bound on `μ_A`. (Since `μ_A` is atomless, every
+  interval is a `μ_A`-continuity set, so for genuinely weakly convergent approximants interval
+  masses converge in both directions; only the lower-bound direction is needed here.)
+* `LogSqLowerBound`: `μ_A([-h,h]) ≥ c / log²(1/h)` for `0 < h < h₀`. It is not proved in this
+  file and never assumed outside the hypotheses below; it is proved unconditionally in round 6
+  as `ThomZeroLevel.logSqLowerBound` (`ThomLean/ZeroLevel/LogSq.lean`).
 * `logSqLowerBound_of_approx` (C): it follows from the same bound for the approximants,
   frequently in `Q`, at each fixed `h`.
 * `not_lqTarget_of_logSq` (C): `LogSqLowerBound ⇒ ¬ LqTarget q` for every `q ≥ 1`. The proof
@@ -106,7 +109,7 @@ theorem le_measureReal_of_moments (μ : Measure ℝ) [IsProbabilityMeasure μ] (
   have : δ + δ + δ = ε := by simp only [δ]; ring
   linarith
 
-/-- **The open estimate of Task 1**: logarithmic concentration of `μ_A` at `0`. -/
+/-- **Logarithmic concentration of `μ_A` at `0`** (proved as `ThomZeroLevel.logSqLowerBound`). -/
 def LogSqLowerBound : Prop :=
   ∃ c : ℝ, 0 < c ∧ ∃ h₀ : ℝ, 0 < h₀ ∧ ∀ h : ℝ, 0 < h → h < h₀ →
     c / log h ^ 2 ≤ muA.real (Icc (-h) h)

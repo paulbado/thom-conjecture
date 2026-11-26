@@ -243,7 +243,8 @@ distribution function. Lean counterparts: `ThomDyadic.dyEnt`, `dyDisc`, `ThomChe
 | 1024 | 0.51603 | 0.50262 | 0.49707 | 0.49399 | 2.0499 |
 
 Values are converged in `Q` (to about `10⁻³`) up to level 8 for `Q = 601`; deeper levels and
-`N = 1024` are still moving with `Q`, so they are upper bounds on the limit.
+`N = 1024` are still moving with `Q`. *(Corrected in round 6: these unconverged values are not
+automatically upper bounds on the limit; they decrease with `Q` here, which is evidence only.)*
 
 * **Dyadic entropy (N).** Converged increments `H_{k+1} − H_k`: `0.019, 0.018, 0.013, 0.013` for
   `k = 5…8` (`Q = 601`). `D_k` ≈ `0.025–0.04` at the same levels. No decay is visible yet, and
@@ -278,3 +279,22 @@ artefact of the narrow bands of the individual `N_{p/q}`, not of `μ_A`.
 (Gauss-node spacing at `0`). The only rigorous lower bound at `0` from the 121 exact moments is
 `μ_A((−0.196, 0.196)) ≥ 0.0696`. The log² law at `h ≤ 2⁻⁴` rests on the stability in `Q` of the
 exact `ν_Q`, not on moments.
+
+## Round 6: cross-flux structure of the finite chiral model (`cross_flux.py`)
+
+`python3 cross_flux.py N [Kmax]` (`N` prime) computes the spectra of the chain operators
+`H_{p,0}` of `ThomZeroLevel.Chain` for every flux `p/N` (for `p ≠ 0` the spectrum does not depend
+on `t`), so `σ_N = N⁻¹ ∑_p ν_p` is an explicit flux average. Outputs: `out_cross_flux_401.txt`
+(`Kmax = 66`) and `out_cross_flux_1009.txt` (`Kmax = 130`). Set `CROSS_FLUX_CACHE=file.npz` to
+cache the spectra.
+
+* (A) The moments of `σ_N` equal the zero-area walk counts (`k ≤ 12`), a check of the
+  decomposition `A F^{p,t}_ξ = F^{p,t}_{Hξ}`.
+* (B) `σ_N([−h,h])·log²(1/h) ≈ 0.50` for `2⁻⁶ ≤ h ≤ 2⁻¹⁰`. The share of this mass coming from
+  fluxes within `0.05` of `1/2` rises from 6% (`h = 1/8`) to about 37% (`h = 2⁻¹⁰`, `N = 1009`).
+* (C, D) Fejér entropy and weighted Fejér energy of flux-window averages. By convexity these
+  bound the values of `σ_N` (exact inequality). Windows of fixed width keep the increments
+  decreasing; flux-wise (width `1/N`) the increments grow.
+
+These are finite-`N` computations: degrees above `≈ 2√N` are not moments of `μ_A`, and finite-`N`
+entropies are not upper bounds on the limiting ones.

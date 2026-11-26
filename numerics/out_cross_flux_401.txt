@@ -1,0 +1,32 @@
+N = 401
+(A) moments of sigma_N vs zero-area walk counts (exact for (k+1)^2 <= N)
+   k= 0  sigma_N:         1.0000   exact: 1
+   k= 2  sigma_N:         4.0000   exact: 4
+   k= 4  sigma_N:        28.0000   exact: 28
+   k= 6  sigma_N:       232.0000   exact: 232
+   k= 8  sigma_N:      2156.0000   exact: 2156
+   k=10  sigma_N:     21944.0000   exact: 21944
+   k=12  sigma_N:    240280.0000   exact: 240280
+(B) sigma_N([-h,h]) and the share from flux windows |alpha - a/q| <= eta (primitive a/q)
+   window q=2, eta=0.05 holds 0.100 of the fluxes
+   window q=4, eta=0.02 holds 0.080 of the fluxes
+   window q=6, eta=0.01 holds 0.040 of the fluxes
+   h=2^3  mass=7.9064e-02  mass*log^2(1/h)=0.3419  q=2,eta=0.05: 0.063  q=4,eta=0.02: 0.040  q=6,eta=0.01: 0.016
+   h=2^4  mass=5.6706e-02  mass*log^2(1/h)=0.4359  q=2,eta=0.05: 0.088  q=4,eta=0.02: 0.056  q=6,eta=0.01: 0.021
+   h=2^5  mass=3.9645e-02  mass*log^2(1/h)=0.4762  q=2,eta=0.05: 0.125  q=4,eta=0.02: 0.080  q=6,eta=0.01: 0.030
+   h=2^6  mass=2.9252e-02  mass*log^2(1/h)=0.5060  q=2,eta=0.05: 0.170  q=4,eta=0.02: 0.105  q=6,eta=0.01: 0.041
+   h=2^7  mass=2.1667e-02  mass*log^2(1/h)=0.5101  q=2,eta=0.05: 0.230  q=4,eta=0.02: 0.119  q=6,eta=0.01: 0.048
+   h=2^8  mass=1.6635e-02  mass*log^2(1/h)=0.5115  q=2,eta=0.05: 0.299  q=4,eta=0.02: 0.126  q=6,eta=0.01: 0.052
+   h=2^9  mass=1.2776e-02  mass*log^2(1/h)=0.4972  q=2,eta=0.05: 0.335  q=4,eta=0.02: 0.144  q=6,eta=0.01: 0.051
+   h=2^10  mass=1.0175e-02  mass*log^2(1/h)=0.4889  q=2,eta=0.05: 0.385  q=4,eta=0.02: 0.133  q=6,eta=0.01: 0.055
+(C) Fejer entropy Ent_K of flux-window mixtures (degree K Fejer density of theta_* sigma)
+   K= 8  full average: 0.1703  windows:  eta=1/2: 0.170  eta=1/4: 0.179  eta=1/8: 0.182  eta=1/16: 0.183  eta=1/32: 0.183  eta=1/64: 0.183  eta=1/128: 0.183  flux-wise: 0.183
+   K=16  full average: 0.2659  windows:  eta=1/2: 0.266  eta=1/4: 0.308  eta=1/8: 0.330  eta=1/16: 0.340  eta=1/32: 0.343  eta=1/64: 0.344  eta=1/128: 0.344  flux-wise: 0.345
+   K=32  full average: 0.3417  windows:  eta=1/2: 0.342  eta=1/4: 0.434  eta=1/8: 0.497  eta=1/16: 0.544  eta=1/32: 0.566  eta=1/64: 0.574  eta=1/128: 0.576  flux-wise: 0.577
+   K=64  full average: 0.3963  windows:  eta=1/2: 0.396  eta=1/4: 0.536  eta=1/8: 0.639  eta=1/16: 0.732  eta=1/32: 0.795  eta=1/64: 0.831  eta=1/128: 0.848  flux-wise: 0.855
+(D) weighted Fejer energy  W_K = ||Fejer_K density of (E/4)^2 mu / arcsine||^2  (Jensen: same
+    window inequality W_K(sigma) <= sum_b w_b W_K(sigma_b); WeightedTarget <=> sup_K W_K < oo)
+   K=  8  full average: 0.0787  windows:  eta=1/4: 0.082  eta=1/16: 0.083  eta=1/64: 0.083  flux-wise: 0.083
+   K= 16  full average: 0.1026  windows:  eta=1/4: 0.117  eta=1/16: 0.126  eta=1/64: 0.127  flux-wise: 0.127
+   K= 32  full average: 0.1233  windows:  eta=1/4: 0.157  eta=1/16: 0.193  eta=1/64: 0.203  flux-wise: 0.204
+   K= 64  full average: 0.1389  windows:  eta=1/4: 0.196  eta=1/16: 0.274  eta=1/64: 0.322  flux-wise: 0.330
