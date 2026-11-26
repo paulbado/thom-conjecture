@@ -323,3 +323,21 @@ Findings (Monte Carlo, error on `R_L` ≈ ±0.1):
 * The binned entropy of `g_{L,θ}` is flat at `≈ −1.85`.
 
 These are evidence only: they do not bound the entropy of `μ_A` in either direction.
+
+## Round 8: Fejér entropies of the Dirichlet model at its own scale (`strip_entropy.py`)
+
+* `python3 strip_entropy.py samples`: for `n = 8, …, 128` and `W = n/2`, estimates the Chebyshev
+  coefficients of the Dirichlet model `σ_W`, `σ_{2W}` on a randomly shifted
+  `√samples × √samples` grid in `(α,θ)`. It computes the Fejér entropies `H_n(σ_{2W})` and
+  `H_n(μ_A)` (exact `c_m`, `cheb_coeffs_n256.txt`). It also checks the Lean two-scale identity
+  `c_m(μ_A) = 2c_m(σ_{2W}) − c_m(σ_W)`. Output `out_strip_entropy.txt` (`samples = 90000`).
+* `python3 strip_deficit.py` (deficit check): `b_k = ∑_{zero-area closed w} width(w)` equals
+  `2, 26, 296, 3386, 40152` for `k = 2, …, 10`. These are exactly the values found in round 7.
+
+Findings:
+* The two-scale identity holds to `1e−16` wherever the grid resolves the degree (`n ≤ 32`; `8e−9` at
+  `n = 64`).
+* `H_n(σ_{2W})` and `H_n(μ_A)` agree to within `0.02` (`n = 8`) and to within `0.0004` (`n = 128`).
+* `H_n(μ_A) = 0.187, 0.274, 0.345, 0.397, 0.434` for `n = 8, 16, 32, 64, 128`.
+
+Evidence only. Lean proves `H_n(μ_A) ≤ 2H_n(σ_{2W}) + 2log2 + 1`. No uniform bound on either side is proved.

@@ -62,6 +62,16 @@ torsion-free groups.
   if `μ_A = f·ρ` then `∫ f log²(1+f) dρ = ∞`. Round 7 also proves simplicity of the Dirichlet
   eigenvalues (`ThomDirichlet.eig_proportional`) and the Jensen multiplicity inequality behind the
   coarea entropy bound (`ThomDirichlet.sum_mul_log_sum_le`); see §10.
+* **The logarithmic upper bound at `0` (round 8, unconditional).**
+  `ThomUpper.logUpperBound_explicit`: `μ_A([−h,h]) ≤ 17284 (1 + log log(1/h))³ / log²(1/h)`
+  for `0 < h ≤ e^{−121}`. With `logSqLowerBound`, the mass at `0` is `log^{−2}(1/h)` up to the
+  factor `(log log)³`. Consequently `ThomUpper.logMoment_finite_iff`: for `s > 0`,
+  `∫_{|E|<1} log^s(1/|E|) dμ_A < ∞ ⟺ s < 2`. Absolute continuity is not assumed (§11).
+* **Dirichlet strip model (round 8).** `ThomStrip.stripMoment_formula`: the grid-averaged
+  Dirichlet model `σ_{W,N}` satisfies `W∫Eᵏ dσ_{W,N} = W τ(Aᵏ) − b_k` exactly, with
+  `b_k = ∑ width(w)` over zero-area closed walks (`k ≤ 2W`, `(k+1)² ≤ N`). Hence the two-scale
+  identity `∫P dμ_A = 2∫P dσ_{2W} − ∫P dσ_W` (`deg P ≤ 2W`), the Fejér domination
+  `0 ≤ F_n^{μ_A} ≤ 2F_n^{σ_{2W}}` and `H_n(μ_A) ≤ 2H_n(σ_{2W}) + 2 log 2 + 1` (§11).
 * **Conditional absolute continuity.** Each open target below implies `μ_A ≪ Lebesgue`
   (`ThomConclusions.muA_ac_of_principal`, `ThomNoAtoms.muA_ac_of_weightedTarget`,
   `ThomConclusions.muA_ac_of_LqTarget`, `ThomFejer.muA_ac_of_fejerTarget`,
@@ -76,7 +86,7 @@ torsion-free groups.
 | `sup_N ∫ abs(F_N)^p dρ < ∞`, `p > 1` (Fejér densities) | `ThomFejer.FejerTarget` | `μ_A ≪ dE`; `p = 3/2` gives `LqTarget 3` | **false** for every `p > 1` (Lean: `ThomZeroLevel.not_fejerTarget`) |
 | `abs τ((A/4)² P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}` | `ThomFejer.WeightedLqTarget` | with `muA_no_atoms`, `μ_A ≪ dE`; `q = 2` is `WeightedTarget` | compatible with the exact flux averages for `q ≥ 2` |
 | `abs τ(P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}`, some `q < ∞` | `ThomConclusions.LqTarget` | `μ_A ≪ dE`; forces `μ_A([−h,h]) = O(h^{1/q})` (`ThomFejer.muA_le_of_lqTarget`); refuted by `LogSqLowerBound` (`ThomLowerBound.not_lqTarget_of_logSq`) | **false** for every `q ≥ 1` (Lean: `ThomZeroLevel.not_lqTarget`) |
-| `sup_N ∫ F_N log F_N dρ < ∞` (Fejér entropy) | `ThomWeightedL2.FejerEntropyTarget` | `μ_A ≪ dE` (`muA_ac_of_fejerEntropyTarget`); implied by every `FejerTarget p` | **recommended**: not contradicted by the proved lower bound (a profile with `μ([−h,h]) ≍ 1/log²(1/h)` can have finite entropy); increments decay by `≈ 0.72` per doubling of `N` up to `N = 512` |
+| `sup_N ∫ F_N log F_N dρ < ∞` (Fejér entropy) | `ThomWeightedL2.FejerEntropyTarget` | `μ_A ≪ dE` (`muA_ac_of_fejerEntropyTarget`); implied by every `FejerTarget p`; implied by a uniform bound on the strip entropies `H_n(σ_{2n+2})` (`ThomStrip.fejerEntropyTarget_of_strip`, round 8) | **recommended**: not contradicted by the proved lower bound (a profile with `μ([−h,h]) ≍ 1/log²(1/h)` can have finite entropy); increments decay by `≈ 0.72` per doubling of `N` up to `N = 512` |
 | `∑_k D_k(λ) < ∞`, `λ = θ_*μ_A` (dyadic discrepancies) | `Summable (ThomDyadic.dyDisc ThomDyadicTarget.lam)` | `μ_A ≪ dE` (`ThomDyadicTarget.muA_ac_of_summable_dyDisc`) | undecided: `D_k ≈ 0.03–0.04` at the levels resolved by `Q ≤ 601` |
 | `μ_A([−h,h]) ≥ c/log²(1/h)` (a lower bound, not a regularity target) | `ThomLowerBound.LogSqLowerBound` | refutes `LqTarget q` (all `q ≥ 1`), `FejerTarget p` (all `p > 1`), `PrincipalTarget` | **proved** (`ThomZeroLevel.logSqLowerBound`, `c = 1/165888000`); numerically `≈ 0.47/log²(1/h)` |
 
@@ -109,14 +119,14 @@ To reproduce locally:
 ```bash
 lake exe cache get                 # optional: download the Mathlib build cache
 lake build                         # compile everything
-scripts/check_axioms.sh audit.txt  # sorry / axiom scan + #print axioms on 248 theorems
+scripts/check_axioms.sh audit.txt  # sorry / axiom scan + #print axioms on 304 theorems
 scripts/module_status.sh           # per-module build table
 ```
 
 ### Status of each module
 
-Last local verification (round 6, commit `d2b62c0`): full `lake build` succeeds (7248 jobs),
-248 theorems audited, all depending only on `propext`, `Classical.choice`, `Quot.sound`.
+Last local verification (round 8): full `lake build` succeeds (7684 jobs),
+304 theorems audited, all depending only on `propext`, `Classical.choice`, `Quot.sound`.
 The live status of every module is in the summary of the latest workflow run.
 
 | Module | File | Build | Theorems/lemmas | Audited in Audit.lean |
@@ -152,6 +162,17 @@ The live status of every module is in the summary of the latest workflow run.
 | `ThomLean.ZeroLevel.Trig` | `ThomLean/ZeroLevel/Trig.lean` | ✅ passing | 7 | 7 |
 | `ThomLean.ZeroLevel.Family` | `ThomLean/ZeroLevel/Family.lean` | ✅ passing | 12 | 11 |
 | `ThomLean.ZeroLevel.LogSq` | `ThomLean/ZeroLevel/LogSq.lean` | ✅ passing | 12 | 11 |
+| `ThomLean.ZeroLevel.Orlicz` | `ThomLean/ZeroLevel/Orlicz.lean` | ✅ passing | 1 | 1 |
+| `ThomLean.Dirichlet.Coarea` | `ThomLean/Dirichlet/Coarea.lean` | ✅ passing | 1 | 1 |
+| `ThomLean.Dirichlet.Simple` | `ThomLean/Dirichlet/Simple.lean` | ✅ passing | 2 | 2 |
+| `ThomLean.UpperBound.Moment` | `ThomLean/UpperBound/Moment.lean` | ✅ passing | 11 | 4 |
+| `ThomLean.UpperBound.Maximal` | `ThomLean/UpperBound/Maximal.lean` | ✅ passing | 7 | 3 |
+| `ThomLean.UpperBound.Bad` | `ThomLean/UpperBound/Bad.lean` | ✅ passing | 8 | 1 |
+| `ThomLean.UpperBound.Gap` | `ThomLean/UpperBound/Gap.lean` | ✅ passing | 3 | 3 |
+| `ThomLean.UpperBound.Decomp` | `ThomLean/UpperBound/Decomp.lean` | ✅ passing | 22 | 7 |
+| `ThomLean.UpperBound.Upper` | `ThomLean/UpperBound/Upper.lean` | ✅ passing | 13 | 6 |
+| `ThomLean.UpperBound.LogMoment` | `ThomLean/UpperBound/LogMoment.lean` | ✅ passing | 12 | 5 |
+| `ThomLean.Dirichlet.Strip` | `ThomLean/Dirichlet/Strip.lean` | ✅ passing | 45 | 23 |
 
 | File | Content |
 |---|---|
@@ -186,6 +207,16 @@ The live status of every module is in the summary of the latest workflow run.
 | `ThomLean/ZeroLevel/Trig.lean` | bond moduli `2abs(cos)`, ratio bounds near flux `1/2` |
 | `ThomLean/ZeroLevel/Family.lean` | the quasimode family, disjoint bands, eigenvalue count, window counts |
 | `ThomLean/ZeroLevel/LogSq.lean` | Riemann sum, transfer, `logSqLowerBound`, refutations, Task 2 in exponential form |
+| `ThomLean/ZeroLevel/Orlicz.lean` | no `L log² L` density (round 7) |
+| `ThomLean/Dirichlet/Coarea.lean`, `Simple.lean` | Jensen multiplicity inequality, simplicity of Dirichlet eigenvalues (round 7) |
+| `ThomLean/UpperBound/Moment.lean` | pairwise independence of the bond logarithms, `∑ log²‖1+ψ‖ ≤ 5N` |
+| `ThomLean/UpperBound/Maximal.lean` | dyadic Rademacher–Menshov maximal inequality, counting form |
+| `ThomLean/UpperBound/Bad.lean` | bad blocks, centering, `#bad · T² ≤ 320(ℓ+1)²2^ℓN²` |
+| `ThomLean/UpperBound/Gap.lean` | chiral block gap `‖η‖² ≤ 4m²e^T‖Jη‖²` |
+| `ThomLean/UpperBound/Decomp.lean` | adaptive dyadic decomposition, vanishing sets, coercivity, counts |
+| `ThomLean/UpperBound/Upper.lean` | codimension min–max, `σ_N([−h,h])` bound, `logUpperBound_explicit` |
+| `ThomLean/UpperBound/LogMoment.lean` | `∫ log^s(1/abs E) dμ_A < ∞ ⟺ s < 2` |
+| `ThomLean/Dirichlet/Strip.lean` | strip graph, exact Dirichlet moments, two-scale and Fejér identities, entropy reduction |
 | `Audit.lean` | `#print axioms` for the principal theorems |
 | `numerics/` | Python scripts and data, not part of the proofs |
 
@@ -688,6 +719,126 @@ growth is driven by `M_L/L ≈ √L` preimages of very unequal weight and by an 
 entropy `H(p_E)`, not only the count `M_L`. Since the true binned entropy is flat, the numerics
 do not contradict a uniform bound for `∫ ḡ_L log ḡ_L` itself. They only indicate that `R_L`
 probably does not provide it.
+
+### 11. The logarithmic upper bound at `0` and the two-scale Dirichlet identity (round 8)
+
+Legend as above: **[L]** proved in Lean (standard axioms only), **[P]** paper argument,
+**[N]** numerics.
+
+#### 11.1 Audit of the proposed argument
+
+The six-step argument proposed for round 8 was audited before it was formalized. **No
+mathematical defect was found.** Three points needed care, and each is handled in the Lean proof:
+
+* *Centering.* `E[X_j] = μ_N` is not zero. The bad-block event uses
+  `|∑(−1)^j X_j| > T/4`. The alternating sum cancels `μ_N` up to one term, and `|μ_N| ≤ √5 < 3`
+  (`abs_muX_lt`). Absorbing that term needs `T ≥ 24`; the proposal's "T sufficiently large" was
+  made explicit.
+* *Min–max.* The decomposition is used in codimension form (`card_le_of_coercive`). Each cut
+  imposes two vanishing sites, and coercivity holds on the subspace where they vanish. This
+  gives `#ι + #{|λ| ≤ h} ≤ #X` directly. It avoids the block-diagonal reduction, which would
+  need the cross terms to vanish.
+* *Gap constant.* The gap is `e^{−T/2}/(2m)` rather than `e^{−T/2}/m`
+  (`chiral_gap: ‖η‖² ≤ 4m² e^T ‖Jη‖²`). This changes only constants.
+
+#### 11.2 Proved theorems **[L]**
+
+| Statement | Lean name |
+|---|---|
+| `(p,t) ↦ (t+pa, t+pb)` is a bijection of `(ℤ/N)²` when `a−b` is a unit (pairwise independence) | `ThomUpper.pair_bijective`, `sum_pair` |
+| `∑_u log²‖1+ψ(u)‖ ≤ 5N` (`N` odd), i.e. `E[X_j²] ≤ 5` | `ThomUpper.sum_lb_sq_le` |
+| Dyadic Rademacher–Menshov: `max_{m≤2^r} S_m² ≤ (r+1) Q_r` and `∑ Q_r ≤ (r+1) 2^r V` | `psum_sq_le_Qd`, `sum_Qd_le`, `card_bad_le` |
+| `#{bad (p,t)} · T² ≤ 320 (ℓ+1)² 2^ℓ N²` (`N` prime, `T ≥ 24`) | `ThomUpper.card_badB_le` |
+| Chiral block gap: on a good block of length `2m`, `‖η‖² ≤ 4m² e^T ‖Jη‖²` | `ThomUpper.chiral_gap`, `block_gap` |
+| Adaptive decomposition: `‖ξ‖² ≤ 4^K e^T ‖Hξ‖²` off the vanishing set, with `#Z ≤ 2 + 2·#bad` per level | `Zt_coercive`, `Ztop_coercive`, `card_Ztop_le` |
+| `σ_N([−h,h]) ≤ 2/2^K + 640(K+1)³/T² + 2^K/N` (`4^K e^T h² < 1`) | `ThomUpper.nuQ_upper` |
+| **`μ_A([−h,h]) ≤ 17284 (1+log log(1/h))³ / log²(1/h)`**, `0 < h ≤ e^{−121}` | `ThomUpper.logUpperBound_explicit`, `logUpperBound` |
+| **`∫_{|E|<1} log^s(1/|E|) dμ_A < ∞ ⟺ s < 2`** (`s > 0`) | `ThomUpper.logMoment_finite_iff` |
+| Strip graph `[0,W)×ℤ/N×ℤ/N` (Dirichlet walls in `x`): symmetric, spectrum in `[−4,4]`, powers count strip walks | `ThomStrip.sMat_isHermitian`, `abs_eig_sMat_le`, `sMat_pow_apply`, `sWalk_eq_some` |
+| **Exact Dirichlet moments**: `W∫Eᵏ dσ_{W,N} = W τ(Aᵏ) − b_k` for `k ≤ 2W`, `(k+1)² ≤ N`, with `b_k = ∑_{w∈Z_k} width(w)`, `0 ≤ 2b_k ≤ k τ(Aᵏ)` | `ThomStrip.stripMoment_formula`, `two_bk_le` |
+| **Two-scale identity**: `∫P(E/4) dμ_A = 2∫P(E/4) dσ_{2W,N} − ∫P(E/4) dσ_{W,N}` for `deg P ≤ 2W`, `(2W+1)² ≤ N` | `ThomStrip.two_scale_poly`, `two_scale_cheb` |
+| **Fejér identity and domination**: `F_n^{μ_A} = 2F_n^{σ_{2W}} − F_n^{σ_W}` and `0 ≤ F_n^{μ_A} ≤ 2F_n^{σ_{2W}}` on `[−4,4]` (`n ≤ 2W`) | `ThomStrip.fejer_two_scale`, `fejer_dom` |
+| **Entropy domination**: `H_n(μ_A) ≤ 2H_n(σ_{2W,N}) + 2 log 2 + 1`; a uniform bound on `H_n(σ_{2n+2,(2n+3)²})` implies `FejerEntropyTarget` | `ThomStrip.fejEnt_two_scale_le`, `fejerEntropyTarget_of_strip` |
+
+Remarks.
+
+* The upper bound uses `muA_no_atoms` and moment matching along odd primes `N`, like the lower bound.
+* `logMoment_finite_iff` does not assume a density. The direction `s ≥ 2` uses only
+  `logSqLowerBound` and `muA_no_atoms`. The direction `s < 2` uses a layer cake with weights
+  `(j+1)^s − j^s` and the upper bound.
+* `σ_{W,N}` is the average of the vertex spectral measures at `(j,0,0)`, `j < W`. The proof of
+  `stripMoment_formula` identifies its moments with walks: a closed strip walk from `(j,0,0)`
+  is a zero-area closed walk of `H₃(ℤ)` whose columns stay in `[0,W)`. The number of admissible
+  `j` is `W − width(w)`, since `2·width(w) ≤ k`.
+
+#### 11.3 Paper arguments **[P]**
+
+* *Identification with the round-7 model.* The Fourier transform in `(b,c) ∈ (ℤ/N)²` splits the
+  strip graph into the matrices `H_W(α,θ)` with `α, θ ∈ (1/N)ℤ/ℤ`. So `σ_{W,N}` is the
+  `N × N` grid average of the round-7 Dirichlet model. The round-7 proof gives the same moments
+  for the continuous `(α,θ)` average. Hence `σ_{W,N}` and `σ_W` have the same moments up to
+  degree `√N − 1`, and every identity in §11.2 holds for `σ_W` with `N` removed.
+  Not formalized: the Fourier splitting. **[N]** check: the deficits `b_2, …, b_10` computed
+  as `∑ width` are `2, 26, 296, 3386, 40152`. These are exactly the values of
+  `L(τ(Aᵏ) − m_k(L))` found in round 7 by quadrature.
+* *Removing the logarithmic losses.* The factor `(1+log log)³` has two sources.
+  - The `(ℓ+1)²` comes from Rademacher–Menshov. This step uses only pairwise independence
+    (orthogonality), and for general orthogonal systems Rademacher–Menshov is sharp.
+  - One more factor `(K+1)` comes from summing over the `K ≍ log T` levels.
+  - For three or more indices the bond phases `t + p(j+1)` are not independent: they lie on
+    one line in `(ℤ/N)²`. So Doob's inequality and higher-moment (Chebyshev-free) tail bounds
+    are not available from the averaging over `(p,t)` alone.
+  - Removing all three factors would need a large-deviation bound for the alternating Birkhoff
+    sums `∑(−1)^j log|2cos π(t+pj)/N|`. Shifted Sudler-product estimates for badly
+    approximable `p/N` are the natural tool. **Not attempted in Lean; open.**
+  - We do not know whether the truth is `1/log²` or carries a `log log` power. The lower bound
+    `c/log²` and the upper bound differ by `(log log)³`.
+* *Local estimates away from `0`.* The decomposition argument localizes at an energy `E₀` only
+  through the chiral structure of the chain operator at `E = 0`. Away from `0` the transfer
+  matrices are not chiral. The analogue needs Lyapunov-type lower bounds for the cocycle at
+  energy `E₀`, uniform over the phases `(p,t)`. No such estimate is proved here. The localization
+  `muA_ac_iff_local` (round 5) reduces absolute continuity to these local problems.
+* *Cross-flux interactions.* The two-scale identity holds at the level of `(α,θ)`-averages. It
+  says nothing about the branch structure of a single flux. Every estimate proved this round
+  averages over fluxes first.
+
+#### 11.4 Numerics **[N]** (`numerics/strip_entropy.py`, `out_strip_entropy.txt`)
+
+Fejér entropies `H_n = ∫F_n log F_n dρ`. `H_n(σ_{2W})` uses `300²` grid points in `(α,θ)`;
+`H_n(μ_A)` uses the exact coefficients `c_m(μ_A)` (`cheb_coeffs_n256.txt`).
+
+| `n` | `W` | `H_n(μ_A)` | `H_n(σ_{2W})` | `max_m |c_m(μ_A) − (2c_m(σ_{2W}) − c_m(σ_W))|` |
+|---|---|---|---|---|
+| 8 | 4 | 0.1867 | 0.2072 | `2e−16` |
+| 16 | 8 | 0.2736 | 0.2854 | `4e−16` |
+| 32 | 16 | 0.3446 | 0.3503 | `3e−16` |
+| 64 | 32 | 0.3973 | 0.3994 | `8e−9` |
+| 128 | 64 | 0.4341 | 0.4345 | `3e−3` (grid too coarse for `n = 128`) |
+
+* The two-scale identity holds to machine precision wherever the grid resolves the degree. This
+  independently checks the Lean identity together with the paper identification of §11.3.
+* `H_n(σ_{2W})` tracks `H_n(μ_A)` closely. This is expected: `c_m(σ_{2W}) = c_m(μ_A) − β_m/(2W)`
+  with `β_m` the Chebyshev transform of `b_k`.
+* The increments of `H_n(μ_A)` per doubling are `0.087, 0.071, 0.053, 0.037`, decaying by a factor
+  of about `0.75`, consistent with round 5. This is suggestive of convergence, not evidence of it.
+
+#### 11.5 Status and remaining obstructions
+
+* **Absolute continuity of `μ_A` is not proved.** The logarithmic upper bound controls only the
+  mass near `0`. It is compatible with both a density and a singular continuous part.
+* The zero level is no longer an obstruction to the entropy target at the level of masses.
+  If `μ_A` has a density `f`, Jensen on dyadic shells bounds the shell contribution
+  `∑ m_j log(m_j 2^j)` by `∫ log(1/|E|) dμ_A + O(1)`, which is finite (`s = 1`). This is a
+  lower-bound obstruction removed, not an upper bound: within-shell regularity of `f` is not
+  controlled.
+* `fejerEntropyTarget_of_strip` reduces `FejerEntropyTarget` to a statement about the
+  finite-dimensional Dirichlet model at its own scale. The numerics show the two entropies are
+  nearly equal, so the reduction transfers the difficulty rather than removing it. What it gains
+  is structure: the strip model is a family of `2W × 2W` Jacobi matrices with simple, analytic
+  eigenvalue branches (§10.4), so coarea and transversality arguments apply to it directly.
+  The uncorrected coarea–Jensen bound `R_L` of §10.5 is **not** used anywhere.
+* Open: `FejerEntropyTarget`, `WeightedTarget`, the dyadic target, and the strip-entropy
+  hypothesis of `fejerEntropyTarget_of_strip`.
 
 ## Numerical evidence (see `numerics/README.md`)
 

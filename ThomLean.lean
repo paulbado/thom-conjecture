@@ -38,3 +38,5 @@ import ThomLean.UpperBound.Bad
 import ThomLean.UpperBound.Gap
 import ThomLean.UpperBound.Decomp
 import ThomLean.UpperBound.Upper
+import ThomLean.UpperBound.LogMoment
+import ThomLean.Dirichlet.Strip
