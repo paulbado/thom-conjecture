@@ -1,0 +1,50 @@
+name: Lean build and axiom audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: lake build + audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan, fetch Mathlib cache, lake build
+        uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          use-mathlib-cache: true
+          build: true
+
+      - name: Verification gate (no sorry / admit / custom axioms, standard axioms only)
+        run: scripts/check_axioms.sh audit.txt
+
+      - name: Per-module build status
+        if: always()
+        run: |
+          scripts/module_status.sh module_status.md
+          {
+            echo "## Per-module build status"
+            echo
+            cat module_status.md
+            echo
+            echo "## Axiom audit"
+            echo
+            echo '```'
+            cat audit.txt 2>/dev/null || echo "(audit not run)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-report
+          path: |
+            audit.txt
+            module_status.md

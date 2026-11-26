@@ -1,19 +1,118 @@
-# thom-conjecture — Lean 4 formalization (Bado–Pittet, Heisenberg model)
+# thom-conjecture: Lean 4 formalization of the Heisenberg model (Bado–Pittet)
 
-This is a Lean 4 / Mathlib formalization that accompanies the Bado–Pittet work on canonical
-spectral measures. It concerns `A = x + x⁻¹ + y + y⁻¹` in the discrete Heisenberg group `H₃(ℤ)`.
+[![Lean build and axiom audit](https://github.com/paulbado/thom-conjecture/actions/workflows/lean.yml/badge.svg?branch=main)](https://github.com/paulbado/thom-conjecture/actions/workflows/lean.yml)
+![Lean v4.36.0](https://img.shields.io/badge/Lean-v4.36.0-blue)
+![Mathlib v4.36.0](https://img.shields.io/badge/Mathlib-v4.36.0-blue)
+![sorry: 0](https://img.shields.io/badge/sorry-0-brightgreen)
+![custom axioms: 0](https://img.shields.io/badge/custom%20axioms-0-brightgreen)
 
-**It does not prove Thom's conjecture, and it does not prove that `μ_A` is absolutely
-continuous.** Even a full solution of this Heisenberg model would not settle the general
-question for torsion-free groups.
+This repository is a Lean 4 / Mathlib formalization that accompanies the Bado–Pittet work on
+canonical spectral measures. It studies the self-adjoint element `A = x + x⁻¹ + y + y⁻¹` of the
+group ring of the discrete Heisenberg group `H₃(ℤ)` and its spectral measure `μ_A`.
 
-* Toolchain: Lean `v4.36.0`, Mathlib `v4.36.0`.
-* Build: `lake exe cache get` (optional), then `lake build`.
-* Axiom audit: `lake env lean Audit.lean`. Every listed theorem depends only on
-  `propext`, `Classical.choice` and `Quot.sound`. A few of them use only `propext`.
-* There is no `sorry`, no `admit` and no custom `axiom`. Open targets appear only as `def … : Prop`.
+**Scope.** The repository does **not** prove Thom's conjecture. It does **not** yet prove that
+`μ_A` is absolutely continuous: that statement is reduced to explicitly named open propositions.
+Even a complete solution of this Heisenberg model would not settle the general question for
+torsion-free groups.
 
-## Status legend
+## What is proved
+
+* **The spectral measure exists and is unique.** `ThomExistence.muA` is built without von Neumann
+  algebras, from the finite quotients `H₃(ℤ/N)` (matrix spectral theorem, exact moment matching
+  for `(k+1)² ≤ N`, Prokhorov compactness). `isSpectralMeasureA_iff` shows it is the only
+  probability measure on `[-4,4]` with moments `τ(Aᵏ)`.
+* **Moments are walk counts.** `τ(Aⁿ)` counts closed lattice walks of zero algebraic area, the
+  rational-flux moments agree with them exactly below the sharp threshold `N_Q = 2⌈2√Q⌉`.
+* **Chebyshev analysis.** Orthonormal basis of `L²(arcsine)`, Parseval, uniqueness from moments,
+  the `L²` criterion and its converse, a weighted criterion away from `0`, an exact formula for
+  the atom at `0`, and an `L^q` duality criterion for absolute continuity.
+* **Conditional absolute continuity.** Each open target below implies `μ_A ≪ Lebesgue`
+  (`ThomConclusions.muA_ac_of_principal`, `muA_ac_of_weighted`, `muA_ac_of_LqTarget`).
+
+## Open targets (named as `def … : Prop`, never assumed)
+
+| Target | Lean name | Consequence proved in Lean | Numerical status |
+|---|---|---|---|
+| `∑ τ(T_n(A/4))² < ∞` | `ThomBridge.PrincipalTarget` | `μ_A ≪ dE` with `L²(arcsine)` density (equivalence) | likely false (log growth) |
+| `∑ (c_{n-2}+2c_n+c_{n+2})² < ∞` | `ThomBridge.WeightedTarget` | `μ_A` off `0` is a.c. with locally `L²` density | doubtful (block energy grows on `[128,256)`) |
+| `μ_A{0} = 0` | `ThomConclusions.NoAtomTarget` | with the weighted target, `μ_A ≪ dE` | supported (estimates `≈ n^{-1/2}`) |
+| `abs τ(P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}`, some `q > 2` | `ThomConclusions.LqTarget` | `μ_A ≪ dE`, no atom hypothesis | plausible (`L^p` norms, `p ≤ 1.75`, look bounded) |
+
+## Verification
+
+Every push to `main` runs the GitHub Actions workflow
+[`.github/workflows/lean.yml`](.github/workflows/lean.yml). It
+
+1. installs the pinned toolchain and the Mathlib cache, then runs `lake build`;
+2. runs [`scripts/check_axioms.sh`](scripts/check_axioms.sh): it fails if the sources contain
+   `sorry`, `admit` or an `axiom` declaration, or if any theorem listed in `Audit.lean` depends on
+   an axiom other than `propext`, `Classical.choice`, `Quot.sound`;
+3. runs [`scripts/module_status.sh`](scripts/module_status.sh), which builds each module separately
+   and publishes the table below in the run summary, together with the full axiom audit
+   (also uploaded as the `verification-report` artifact).
+
+The badge at the top shows the result for the latest commit on `main`.
+
+To reproduce locally:
+
+```bash
+lake exe cache get                 # optional: download the Mathlib build cache
+lake build                         # compile everything
+scripts/check_axioms.sh audit.txt  # sorry / axiom scan + #print axioms on 100 theorems
+scripts/module_status.sh           # per-module build table
+```
+
+### Status of each module
+
+Last local verification on commit `101c6cd`: full `lake build` succeeds (6376 jobs), 100 theorems
+audited, all depending only on `propext`, `Classical.choice`, `Quot.sound` (some only on `propext`).
+The live status of every module is in the summary of the latest workflow run.
+
+| Module | File | Build | Theorems/lemmas | Audited in Audit.lean |
+|---|---|---|---|---|
+| `ThomLean.Chebyshev` | `ThomLean/Chebyshev.lean` | ✅ passing | 2 | 2 |
+| `ThomLean.Chebyshev.Arcsine` | `ThomLean/Chebyshev/Arcsine.lean` | ✅ passing | 31 | 8 |
+| `ThomLean.Chebyshev.Criterion` | `ThomLean/Chebyshev/Criterion.lean` | ✅ passing | 8 | 2 |
+| `ThomLean.Chebyshev.Lebesgue` | `ThomLean/Chebyshev/Lebesgue.lean` | ✅ passing | 8 | 3 |
+| `ThomLean.Heisenberg.Group` | `ThomLean/Heisenberg/Group.lean` | ✅ passing | 15 | 2 |
+| `ThomLean.Heisenberg.Moments` | `ThomLean/Heisenberg/Moments.lean` | ✅ passing | 9 | 6 |
+| `ThomLean.Heisenberg.Isoperimetric` | `ThomLean/Heisenberg/Isoperimetric.lean` | ✅ passing | 14 | 2 |
+| `ThomLean.Heisenberg.Threshold` | `ThomLean/Heisenberg/Threshold.lean` | ✅ passing | 19 | 5 |
+| `ThomLean.Heisenberg.Examples` | `ThomLean/Heisenberg/Examples.lean` | ✅ passing | 10 | 3 |
+| `ThomLean.Reductions.Collision` | `ThomLean/Reductions/Collision.lean` | ✅ passing | 8 | 5 |
+| `ThomLean.Bridge` | `ThomLean/Bridge.lean` | ✅ passing | 12 | 8 |
+| `ThomLean.Chebyshev.Weighted` | `ThomLean/Chebyshev/Weighted.lean` | ✅ passing | 25 | 12 |
+| `ThomLean.Chebyshev.Atom` | `ThomLean/Chebyshev/Atom.lean` | ✅ passing | 14 | 4 |
+| `ThomLean.WeightedBridge` | `ThomLean/WeightedBridge.lean` | ✅ passing | 9 | 9 |
+| `ThomLean.Existence` | `ThomLean/Existence.lean` | ✅ passing | 27 | 11 |
+| `ThomLean.Conclusions` | `ThomLean/Conclusions.lean` | ✅ passing | 14 | 13 |
+| `ThomLean.Chebyshev.Duality` | `ThomLean/Chebyshev/Duality.lean` | ✅ passing | 2 | 1 |
+
+| File | Content |
+|---|---|
+| `ThomLean/Chebyshev.lean` | finite energies, abstract obstruction, target names |
+| `ThomLean/Chebyshev/Arcsine.lean` | arcsine law, orthonormal basis, completeness, Parseval |
+| `ThomLean/Chebyshev/Criterion.lean` | `L²` criterion, uniqueness from moments |
+| `ThomLean/Chebyshev/Lebesgue.lean` | Lebesgue density, absolute continuity, local `L²` |
+| `ThomLean/Chebyshev/Weighted.lean` | weighted measure `(E²/16)μ`, three-term identity, criterion away from `0` |
+| `ThomLean/Chebyshev/Atom.lean` | Cesàro formula for the atom at `0`, energy-growth criterion |
+| `ThomLean/Chebyshev/Duality.lean` | `L^q` duality criterion for absolute continuity |
+| `ThomLean/Heisenberg/Group.lean` | `H₃(ℤ)`, words, walks, algebraic area |
+| `ThomLean/Heisenberg/Moments.lean` | group ring, trace, flux traces, character filter |
+| `ThomLean/Heisenberg/Isoperimetric.lean` | discrete isoperimetric inequality |
+| `ThomLean/Heisenberg/Threshold.lean` | `N_Q`, exact moment matching, sharpness |
+| `ThomLean/Heisenberg/Examples.lean` | kernel-checked small values |
+| `ThomLean/Reductions/Collision.lean` | Poisson kernel, collision identity |
+| `ThomLean/Bridge.lean` | `τ(T_n(A/4))`, principal target equivalences |
+| `ThomLean/WeightedBridge.lean` | weighted target, flux reformulation, Christoffel bound |
+| `ThomLean/Existence.lean` | finite quotients `H₃(ℤ/N)`, existence of `μ_A` |
+| `ThomLean/Conclusions.lean` | consequences for `μ_A`, `L^q` targets |
+| `Audit.lean` | `#print axioms` for the principal theorems |
+| `numerics/` | Python scripts and data, not part of the proofs |
+
+## Detailed status of the statements
+
+### Status legend
 
 * **U**: unconditional theorem.
 * **C**: conditional implication. The hypotheses are stated explicitly and none is equivalent
@@ -21,7 +120,7 @@ question for torsion-free groups.
 * **P**: an open proposition. It is named only and never assumed.
 * **N**: not formalized.
 
-## 1. Chebyshev analytical framework (`ThomLean/Chebyshev/…`)
+### 1. Chebyshev analytical framework (`ThomLean/Chebyshev/…`)
 
 | Statement | Lean name | Status |
 |---|---|---|
@@ -41,7 +140,7 @@ question for torsion-free groups.
 | `weightedEnergy ≤ squareEnergy` (finite sums) | `weightedEnergy_le_squareEnergy` | U |
 | The weighted condition does not imply the `L²` condition (witness `c_n = n^{-1/2}`) | `weighted_not_imp_L2` | U |
 
-## 2. Heisenberg spectral model (`ThomLean/Heisenberg/…`)
+### 2. Heisenberg spectral model (`ThomLean/Heisenberg/…`)
 
 | Statement | Lean name | Status |
 |---|---|---|
@@ -67,7 +166,7 @@ question for torsion-free groups.
 | Identification of `τ_α` with the moments of the Harper density of states `ν_α` | — | **N** |
 | Absolute continuity of `μ^{(q)}` (Floquet theory), `W₁` rate `q^{-1/2}` (Jackson) | — | **N** |
 
-## 3. Analytical reductions (`ThomLean/Reductions/Collision.lean`)
+### 3. Analytical reductions (`ThomLean/Reductions/Collision.lean`)
 
 | Statement | Lean name | Status |
 |---|---|---|
@@ -79,7 +178,7 @@ question for torsion-free groups.
 | Theorem 4.3 (`(C)` ⇒ local `L²` density) | — | **N** (needs Young's inequality in `L^p`, the `W₁` transfer and weak compactness) |
 | Fourier–Bessel transfer estimate, dyadic Haar energy identity | — | **N** (not in the supplied notes) |
 
-## 4. The principal target (`ThomLean/Bridge.lean`)
+### 4. The principal target (`ThomLean/Bridge.lean`)
 
 * `chebTrace n := τ(T_n(A/4))` in `ℝ[H₃]`. `chebTrace_eq` expresses it through the walk counts. **U**
 * `IsSpectralMeasureA μ` says that `μ` is a probability measure on `[-4,4]` with
@@ -93,7 +192,7 @@ question for torsion-free groups.
 * `principalTarget_iff_uniform_flux`: the target holds **if and only if**
   `sup_Q ∑_{1≤n<N_Q} (c_n^{(Q)})² < ∞`. Each sum involves finitely many integer walk counts. **U**
 
-### Remaining unproved statements
+#### Remaining unproved statements
 
 1. (**P**, the principal target) `∑_{n≥1} τ(T_n(A/4))² < ∞`. Equivalently, by
    `principalTarget_iff_uniform_flux`, `∃ K, ∀ Q ≥ 1, ∑_{n=1}^{N_Q−1} (∑_k [Xᵏ]T_n · 4⁻ᵏ · m_k^{(Q)})² ≤ K`.
@@ -109,7 +208,7 @@ question for torsion-free groups.
 6. (**N**) The exact discrepancies `8m` and `8(2m+1)` for general `m`, through the
    equality case of the isoperimetric inequality.
 
-## 5. Weighted measure, atom at zero, existence of `μ_A` (round 3)
+### 5. Weighted measure, atom at zero, existence of `μ_A` (round 3)
 
 | Statement | Lean name | Status |
 |---|---|---|
@@ -138,7 +237,7 @@ question for torsion-free groups.
 | The weighted target itself | — | **P** (numerics now argue against it, see below) |
 | `LqTarget q` for some `q > 2` (an `L^p` density, `p < 2`) | — | **P** (numerically plausible) |
 
-### Numerical evidence (see `numerics/README.md`)
+## Numerical evidence (see `numerics/README.md`)
 
 Round 3 (`n ≤ 256`, see `numerics/README.md`): the weighted block energy `∑_{[128,256)} d_n²`
 is more than twice the one on `[64,128)`, and the smoothed densities develop growing peaks near
@@ -154,27 +253,3 @@ If this persists, **the principal target is false**: `μ_A` would have no `L²(a
 (by `principalTarget_iff_L2`). This is heuristic, and it does not decide absolute continuity
 or local `L^p` regularity for `p < 2`. It suggests moving to targets localized away from `E = 0`,
 or to `L^p` targets with `p < 2`.
-
-## Layout
-
-```
-ThomLean/Chebyshev.lean            finite energies, abstract obstruction, target names
-ThomLean/Chebyshev/Arcsine.lean    arcsine law, orthonormal basis, completeness, Parseval
-ThomLean/Chebyshev/Criterion.lean  L² criterion, uniqueness from moments
-ThomLean/Chebyshev/Lebesgue.lean   Lebesgue density, absolute continuity, local L²
-ThomLean/Heisenberg/Group.lean     H₃(ℤ), words, walks, area
-ThomLean/Heisenberg/Moments.lean   group ring, trace, flux traces, character filter
-ThomLean/Heisenberg/Isoperimetric.lean  |area| ≤ r s
-ThomLean/Heisenberg/Threshold.lean N_Q, moment matching, sharpness
-ThomLean/Heisenberg/Examples.lean  kernel-checked small values
-ThomLean/Reductions/Collision.lean Poisson kernel, collision identity
-ThomLean/Bridge.lean               τ(T_n(A/4)), target equivalences
-ThomLean/Chebyshev/Weighted.lean   weighted measure E²/16·μ, three-term identity, off-zero criterion
-ThomLean/Chebyshev/Atom.lean       Cesàro atom formula, energy-growth criterion
-ThomLean/WeightedBridge.lean       WeightedTarget, flux reformulation, Christoffel bound
-ThomLean/Existence.lean            finite quotients H₃(ℤ/N), spectral measures, existence of μ_A
-ThomLean/Chebyshev/Duality.lean    L^q duality criterion for absolute continuity
-ThomLean/Conclusions.lean          consequences for μ_A, L^q targets
-Audit.lean                         #print axioms for all principal theorems
-numerics/                          scripts and data (not part of the proofs)
-```
