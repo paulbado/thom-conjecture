@@ -298,3 +298,28 @@ cache the spectra.
 
 These are finite-`N` computations: degrees above `≈ 2√N` are not moments of `μ_A`, and finite-`N`
 entropies are not upper bounds on the limiting ones.
+
+## Round 7: continuous-flux Dirichlet model (`dirichlet.py`, `dirichlet_joint.py`, `dirichlet_moments.py`)
+
+Model: `H_L(α,θ)`, `L×L`, off-diagonal `1`, diagonal `2cos(2π(θ+jα))` (README §10).
+
+* `python3 dirichlet_moments.py L kmax`: exact `(α,θ)`-averaged moments (product midpoint rule,
+  exact for trigonometric polynomials of the relevant degree). Output `out_dirichlet_moments.txt`:
+  `L(τ(Aᵏ) − m_k(L)) = 2, 26, 296, 3386, 40152` (`k = 2..10`) for `L = 20, 40, 80`, i.e. the
+  boundary error is exactly `b_k/L`, as in the proposition of §10.3.
+* `python3 dirichlet.py L samples gridfactor`: Hellmann–Feynman derivatives, actual level
+  multiplicities `M_L(θ,E)` (Sturm counts on an `α`-grid of `gridfactor·L²` points), the coarea
+  entropy bound `R_L(θ)`, the ratio distribution `M/(L|∂αE|)`, exceptional sets and a binned
+  entropy of `g_{L,θ}`. Output `out_dirichlet.txt` (`L = 16, 32, 64, 128`: `400 6`; `L = 256`:
+  `200 3`).
+* `python3 dirichlet_joint.py L samples gridfactor`: quantiles and correlation of `|∂αE|/L` and
+  `|∂θE|`, joint small sets, and `R_L` split by energy band. Output `out_dirichlet_joint.txt`.
+
+Findings (Monte Carlo, error on `R_L` ≈ ±0.1):
+* `M_L/L ≈ 0.9√L`, far below `L(L+1)`.
+* `|∂αE|` does not decay (median ≈ 13–17), while `|∂θE|` decays roughly like `1/L`.
+* `R_L` rises from `−1.15` (`L = 16`) to `−0.64` (`L = 256`).
+* The exceptional share (ratio > 10) grows `1.3% → 7%` and is over-represented near `E = 0`.
+* The binned entropy of `g_{L,θ}` is flat at `≈ −1.85`.
+
+These are evidence only: they do not bound the entropy of `μ_A` in either direction.

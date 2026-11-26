@@ -58,6 +58,10 @@ torsion-free groups.
   `ThomZeroLevel.not_principalTarget`, `not_lqTarget` (every `q ≥ 1`) and `not_fejerTarget`
   (every `p > 1`): **these targets are false.** Absolute continuity of `μ_A` and the weighted
   targets are not affected.
+* **No `L log² L` density (round 7, unconditional).** `ThomZeroLevel.not_integrable_mul_log_sq`:
+  if `μ_A = f·ρ` then `∫ f log²(1+f) dρ = ∞`. Round 7 also proves simplicity of the Dirichlet
+  eigenvalues (`ThomDirichlet.eig_proportional`) and the Jensen multiplicity inequality behind the
+  coarea entropy bound (`ThomDirichlet.sum_mul_log_sum_le`); see §10.
 * **Conditional absolute continuity.** Each open target below implies `μ_A ≪ Lebesgue`
   (`ThomConclusions.muA_ac_of_principal`, `ThomNoAtoms.muA_ac_of_weightedTarget`,
   `ThomConclusions.muA_ac_of_LqTarget`, `ThomFejer.muA_ac_of_fejerTarget`,
@@ -508,6 +512,182 @@ inequality is the natural reduction: it would suffice to bound `Ent_K` (or `W_K`
 averages over a fixed finite family of flux windows, uniformly in `K`. Near the
 even-denominator fluxes this needs the zero-level analysis of steps 5–9 with **upper** bounds
 on the number of near-zero eigenvalues, which is not done here.
+
+### 10. Orlicz obstruction and the continuous-flux Dirichlet model (round 7)
+
+Status: **[L]** proved in Lean (no `sorry`, standard axioms), **[P]** paper proof, not formalized,
+**[N]** numerical evidence only.
+
+#### 10.1 The `f log²(1+f)` obstruction **[L]**
+
+`ThomZeroLevel.not_integrable_mul_log_sq` (`ThomLean/ZeroLevel/Orlicz.lean`): if
+`μ_A = f·ρ` (`ρ` the arcsine law, `f ≥ 0` measurable), then `f log²(1+f) ∉ L¹(ρ)`.
+
+The proof follows the suggested split. Take `T = n+3`, `h = T⁻²`. On `[−h,h]` one has
+`f ≤ T + 1_{f>T}·f log²(1+f)/log² T`. The first part gives at most `T·ρ([−h,h]) ≲ T·h = 1/T`. The
+second is `≤ a_n / log² T`, where `a_n = ∫_{f>n+3} f log²(1+f) dρ → 0` by dominated convergence
+if the function were integrable. Then `logSqLowerBound` gives
+`c/(4 log² T) ≤ μ_A([−h,h]) ≤ C/T + a_n/log² T`. Multiplying by `log² T` gives
+`c/4 ≤ C log² T/T + a_n → 0`, a contradiction. This uses no hypothesis beyond the density
+assumption itself, so it says: **if `μ_A` is absolutely continuous, its density is not in the
+Orlicz class `L log² L`.** It is consistent with `f ∈ L log L`: a density `≍ 1/(|E| log³(1/|E|))`
+at `0` has finite entropy.
+
+#### 10.2 Regularized `log²` energies diverge at least like `log log N` **[P]**
+
+Let `f_n` be the cell averages of `μ_A` on the dyadic partition of `[−4,4]` at mesh `2⁻ⁿ` (in
+`E`), and `Φ_n = ∫ φ(f_n) dρ` with `φ(x) = x log²(1+x)`. Note that
+`φ''(x) = (2(2+x)log(1+x) + 2x)/(1+x)² > 0`.
+
+**Claim.** `Φ_n ≥ c₁ log n − C₁`. With `N = 2ⁿ`, this is `≳ log log N`.
+
+*Proof.*
+1. Let `A_j = {2^{−j−1} < |E| ≤ 2^{−j}}` for `j < n`, let `C_n = [−2⁻ⁿ, 2⁻ⁿ]`, and set
+   `m_j = μ_A(A_j)`, `T_j = μ_A([−2^{−j}, 2^{−j}])`. Each set is a union of cells, and
+   `ρ(A_j) ≍ 2^{−j}`.
+2. Jensen on each set gives `∫_{A_j} φ(f_n) dρ ≥ m_j log²(1 + m_j/ρ(A_j))`.
+3. If `m_j ≥ 2^{−j/2}`, this is `≥ m_j (j log 2/2 − C)²`. The indices with `m_j < 2^{−j/2}`
+   lose at most `Σ_j 2^{−j/2} j² < ∞`.
+4. The central cell contributes `≥ T_n (n log 2 − log(1/T_n) − C)²`. Here
+   `log(1/T_n) = O(log n)`, because `T_n ≥ c/(n log 2)²`.
+5. Abel summation then gives
+   `Φ_n ≥ (log²2/4)(1 − o(1)) Σ_{j<n} T_j (2j − 1) − C`.
+6. Inserting `T_j ≥ c/(j log 2)²` gives the claim.
+
+The same lower bound holds for the Fejér `log²` energies, by `F_N(θ) ≥ c N μ̃(θ ± 1/N)` (sketch).
+Only a lower bound is proved. Whether `log log N` is the true rate is open.
+
+#### 10.3 The continuous-flux Dirichlet model and its moments **[P]**, **[N]**
+
+`H_L(α,θ)` is the `L×L` Jacobi matrix with off-diagonal entries `1` and diagonal
+`d_j = 2cos(2π(θ + jα))`, `1 ≤ j ≤ L`. Set
+`m_k(L) = ∫₀¹∫₀¹ L⁻¹ tr H_L(α,θ)ᵏ dα dθ`, and let `σ_L` be the averaged normalized counting
+measure.
+
+**Proposition.** For `L ≥ ⌊k/2⌋`,
+`m_k(L) = τ(Aᵏ) − b_k/L`, with a constant `0 ≤ b_k ≤ k·τ(Aᵏ)`. In particular
+`|m_k(L) − τ(Aᵏ)| ≤ k·4ᵏ/L`, and `σ_L → μ_A` weakly. Since `μ_A` has no atoms, the
+distribution functions converge uniformly.
+
+*Proof.*
+1. Write `d_m = w z^m + w̄ z^{−m}`, with `w = e^{2πiθ}` and `z = e^{2πiα}`.
+2. Expand `(H_Lᵏ)_{jj}` as a sum over paths `j → j` of `k` steps, each in `{−1, 0, +1}`, that
+   stay in `[1,L]`. A `0`-step at site `m` carries `w^{ε} z^{εm}`, with `ε = ±1`.
+3. Averaging over `θ` kills every term with `Σε ≠ 0`, and averaging over `α` kills every term
+   with `Σ ε m ≠ 0`.
+4. Read `±1` steps as horizontal moves and `0`-steps as vertical moves by `ε`. The surviving
+   terms are then exactly the closed walks in `ℤ²` of length `k` with zero algebraic area, which
+   stay in the strip `1 ≤ x ≤ L`.
+5. Without the strip these walks number `τ(Aᵏ)` ("moments are walk counts", rounds 2–3).
+6. A closed walk has horizontal range at most `⌊k/2⌋`. So for `L ≥ ⌊k/2⌋` no walk leaves through
+   both walls, and the deficit `b_k = 2 Σ_{j ≥ 1} #{zero-area walks from x = j that leave x ≥ 1}` does
+   not depend on `L`. Only `j ≤ ⌊k/2⌋` contribute, so `b_k ≤ k τ(Aᵏ)`.
+7. Supports lie in `[−4,4]`, so moment convergence gives weak convergence (Weierstrass). The
+   distribution functions then converge uniformly, by Pólya's theorem and `ThomNoAtoms.muA_no_atoms`.
+
+*Check* (`numerics/dirichlet_moments.py`, exact quadrature). For `L = 20, 40, 80`:
+`L(τ(Aᵏ) − m_k(L)) = 2, 26, 296, 3386, 40152` for `k = 2, …, 10`, independent of `L`, exactly as
+predicted (`out_dirichlet_moments.txt`).
+
+#### 10.4 Simplicity, analytic branches and the top Laurent coefficient
+
+* **[L]** `ThomDirichlet.eig_proportional`, `eig_eq_zero_of_first` (`Dirichlet/Simple.lean`).
+  For any real diagonal, two solutions of the Dirichlet recursion at the same `E` satisfy
+  `u₁ v_j = v₁ u_j`, and an eigenvector has `u₁ ≠ 0`. Hence **every eigenvalue of `H_L(α,θ)` is
+  simple, for all `(α,θ)`**.
+* **[P]** Branches and derivatives.
+  - The ordered eigenvalues `E_1 < … < E_L` are simple roots of `det(E − H_L)`, which is
+    real-analytic in `(α, θ, E)`. By the implicit function theorem they are real-analytic on the
+    whole torus.
+  - Hellmann–Feynman gives `∂_α E_k = ⟨u_k, ∂_α H u_k⟩ = −4π Σ_j j sin(2π(θ+jα)) u_k(j)²`, and the
+    same without the factor `j` for `∂_θ`.
+* **[P]** Top coefficient.
+  - Expand `D(z) = det(E − H_L)` over matchings of adjacent pairs:
+    `D = Σ_{matchings} (−1)^{#pairs} Π_{j unmatched}(E − d_j)`.
+  - The `z`-degree of a term is at most `Σ_{j unmatched} j`. This equals `L(L+1)/2` only for the
+    empty matching with the `−w z^j` part chosen at every `j`. So the coefficient of
+    `z^{L(L+1)/2}` is `(−w)^L ≠ 0`, and symmetrically that of `z^{−L(L+1)/2}` is `(−w̄)^L`.
+  - Hence for every `(θ, E)`, `z^{L(L+1)/2}D` is a polynomial of exact degree `L(L+1)` with
+    nonzero constant term. Consequently:
+    * `M_L(θ,E) ≤ L(L+1)`;
+    * no branch `E_k(·, θ)` is constant on an interval;
+    * `{α : ∂_α E_k = 0}` is finite for each `k, θ`.
+
+#### 10.5 Coarea density and the entropy inequality with actual multiplicities
+
+* **[L]** `ThomDirichlet.sum_mul_log_sum_le` (`Dirichlet/Coarea.lean`). For `a_i ≥ 0` on a
+  finite set of size `M`: `(Σ a_i) log(Σ a_i) ≤ Σ a_i log(M a_i)`. This is Jensen for `x log x`.
+* **[P]** Let `g_{L,θ}` be the density of `L⁻¹ Σ_k (E_k(·,θ))_* dα`. By §10.4 and the 1-d change
+  of variables, `g_{L,θ}(E) = L⁻¹ Σ_{(k,α): E_k(α,θ)=E} |∂_α E_k|⁻¹`, a sum of exactly
+  `M_L(θ,E)` terms (simplicity: one `k` per `α`). The lemma with `a_i = 1/(L|∂_α E_k|)`, followed
+  by the change of variables back, gives
+  `∫ g_{L,θ} log g_{L,θ} dE ≤ R_L(θ) := L⁻¹ Σ_k ∫₀¹ log(M_L(θ,E_k)/(L|∂_α E_k|)) dα`.
+  More precisely, the gap is exact:
+  `R_L(θ) − ∫ g log g = ∫ g(E) (log M_L(θ,E) − H(p_E)) dE ≥ 0`. Here `p_E` is the distribution
+  of the `M` preimage weights and `H` its Shannon entropy.
+* **[P]** After the `θ` average, `ḡ_L = ∫ g_{L,θ} dθ` is the density of `σ_L`, and by
+  convexity `∫ ḡ_L log ḡ_L ≤ ∫ R_L(θ) dθ`. So `sup_L ∫ R_L dθ < ∞` would make `(ḡ_L)` uniformly
+  integrable, and with §10.3 it would give `μ_A ≪ dE`. **This bound is not proved, and the
+  numerics below suggest it fails.**
+
+#### 10.6 Numerics (Task 5) **[N]**
+
+Script: `numerics/dirichlet.py` and `dirichlet_joint.py`, Monte Carlo, `M_L` counted by Sturm
+sequences on an `α`-grid of `6L²` points; for `L = 256`, `3L²` points and 200 samples. Output in
+`out_dirichlet.txt`. Monte Carlo error on `R_L` is about `±0.1`.
+
+| `L` | median `max(|∂θE|,|∂αE|/L)` | mean `M_L` | `L(L+1)` | mean `M_L/L` | `θ`-mean `R_L` | ratio `M/(L|∂αE|)` median / 99% | share ratio > 10 |
+|---|---|---|---|---|---|---|---|
+| 16  | 1.67  | 60   | 272    | 3.8  | −1.15 | 0.28 / 15  | 1.3% |
+| 32  | 1.06  | 163  | 1056   | 5.1  | −1.11 | 0.30 / 14  | 2.5% |
+| 64  | 0.56  | 438  | 4160   | 6.9  | −0.96 | 0.34 / 22  | 3.0% |
+| 128 | 0.22  | 1164 | 16512  | 9.1  | −0.75 | 0.37 / 81  | 4.5% |
+| 256 | 0.13  | 2882 | 65792  | 11.3 | −0.64 | 0.41 / 33  | 7% |
+
+* **Multiplicities.** The actual `M_L` is far below the algebraic bound `L(L+1)`:
+  `M_L/L ≈ 0.9 √L` (exponent ≈ 0.43 from the five points). Replacing `M_L` by `L(L+1)` would
+  add `log L` to the bound and destroy it, so the actual multiplicity is what matters.
+* **Joint transversality** (`dirichlet_joint.py`, `L = 16, 32, 64, 128`):
+  - The decay of the reported median comes from `∂_θ E` and from the normalization `1/L`. The
+    flux derivative itself does **not** decay: the median of `|∂_α E|` is `12.7, 15.7, 16.8, 19.6`.
+  - `|∂_θ E|` decays roughly like `1/L`. This is consistent with band widths `≍ 1/q` at critical
+    coupling, a heuristic and not proved here. Its 10% quantile drops from `0.09` to `0.0007`.
+  - `log|∂_α E|` and `log|∂_θ E|` decorrelate as `L` grows (`0.46, 0.39, 0.24, 0.19`), but the joint
+    small set (both below a tenth of the median) grows, then levels off: `1.5%, 2.8%, 4.4%, 4.1%`.
+  - So the phase direction cannot supply a uniform transversality. The flux direction is the
+    one that carries the density.
+* **Away from `0`.** By energy band, the mean of `log(M/(L|∂αE|))` is about `−1.2` on
+  `0.25 ≤ |E| < 1` and `−1.0` to `−1.25` on `|E| ≥ 1`, roughly stable for `L = 16..128`.
+  The band `|E| < 0.25` is noisy and rising (`−0.54, −0.81, −0.28, −0.08`), carries about 11% of the mass, and
+  contributes little to `R_L` in total.
+* **Exceptional sets.** The share of samples with ratio `> 10` grows: `1.3%, 2.5%, 3%, 4.5%, 7%` for
+  `L = 16..256`. These samples are over-represented near `E = 0`: among them the share with
+  `|E| < 0.25` is `22–40%` (not monotone in `L`), against `10–12%` overall. This
+  matches the log² mass at `0` (§9).
+
+  Truncating them does not obviously give uniform integrability. The exceptional set is not
+  shrinking. A disproportionate part of it sits near `0`, where §10.1 already forbids `L log² L` control.
+* **Trend of the bound.** `R_L` increases by about `0.13` per doubling of `L` (`−1.15, −1.11, −0.96, −0.75, −0.64`). Five points, with Monte Carlo error `≈ 0.1`, cannot decide whether `R_L` converges.
+  A logarithmic growth `≈ 0.19 log L` fits as well as saturation.
+* **Actual entropy.** The binned entropy of `g_{L,θ}` (800 bins, one `θ`; Jensen makes it a
+  lower bound for `∫ g log g`) stays at `≈ −1.85` for all `L`. The gap to `R_L` is the Jensen loss
+  `∫ g(log M − H(p))`, and it grows with `L`.
+
+#### 10.7 Task 6: status
+
+**No uniform entropy bound and no uniform integrability of the averaged Dirichlet densities is
+proved. Absolute continuity of `μ_A` remains open.** What is new and unconditional:
+* §10.1 **[L]**;
+* §10.2 and §10.3 **[P]**;
+* the simplicity and Jensen lemmas **[L]**;
+* the top-coefficient argument and the coarea inequality **[P]**.
+
+The obstruction identified by the numerics: the coarea bound loses `∫ g (log M_L − H(p_E))`. Its
+growth is driven by `M_L/L ≈ √L` preimages of very unequal weight and by an exceptional set, over-represented near
+`E = 0`, that grows with `L`. A proof along these lines would need to control the preimage-weight
+entropy `H(p_E)`, not only the count `M_L`. Since the true binned entropy is flat, the numerics
+do not contradict a uniform bound for `∫ ḡ_L log ḡ_L` itself. They only indicate that `R_L`
+probably does not provide it.
 
 ## Numerical evidence (see `numerics/README.md`)
 

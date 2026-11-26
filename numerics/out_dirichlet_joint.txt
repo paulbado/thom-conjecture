@@ -1,0 +1,32 @@
+L = 16
+  |∂αE|/L quantiles 10/50/90%: 0.143 0.796 3.46;  |∂θE|: 0.0915 1.33 6.39
+  |∂αE| median 12.7;  corr(log|∂αE|, log|∂θE|) = 0.462
+  share with both < median(max)/10: 0.0145  (α alone 0.1055, θ alone 0.1320)
+  band 0 ≤ |E| < 0.25: mass 0.122, mean log ratio -0.536, contribution -0.066
+  band 0.25 ≤ |E| < 1: mass 0.198, mean log ratio -1.244, contribution -0.246
+  band 1 ≤ |E| < 9: mass 0.680, mean log ratio -1.246, contribution -0.848
+  total R_L (θ-averaged Monte Carlo): -1.159
+L = 32
+  |∂αE|/L quantiles 10/50/90%: 0.0812 0.491 2.2;  |∂θE|: 0.0273 0.671 4.16
+  |∂αE| median 15.7;  corr(log|∂αE|, log|∂θE|) = 0.390
+  share with both < median(max)/10: 0.0280  (α alone 0.1055, θ alone 0.1845)
+  band 0 ≤ |E| < 0.25: mass 0.100, mean log ratio -0.808, contribution -0.081
+  band 0.25 ≤ |E| < 1: mass 0.233, mean log ratio -1.152, contribution -0.268
+  band 1 ≤ |E| < 9: mass 0.667, mean log ratio -1.184, contribution -0.790
+  total R_L (θ-averaged Monte Carlo): -1.139
+L = 64
+  |∂αE|/L quantiles 10/50/90%: 0.0437 0.263 1.6;  |∂θE|: 0.00452 0.324 2.88
+  |∂αE| median 16.8;  corr(log|∂αE|, log|∂θE|) = 0.237
+  share with both < median(max)/10: 0.0440  (α alone 0.1130, θ alone 0.2380)
+  band 0 ≤ |E| < 0.25: mass 0.113, mean log ratio -0.281, contribution -0.032
+  band 0.25 ≤ |E| < 1: mass 0.228, mean log ratio -1.204, contribution -0.274
+  band 1 ≤ |E| < 9: mass 0.660, mean log ratio -1.032, contribution -0.681
+  total R_L (θ-averaged Monte Carlo): -0.987
+L = 128
+  |∂αE|/L quantiles 10/50/90%: 0.0232 0.153 1.01;  |∂θE|: 0.000675 0.122 1.94
+  |∂αE| median 19.6;  corr(log|∂αE|, log|∂θE|) = 0.188
+  share with both < median(max)/10: 0.0410  (α alone 0.1060, θ alone 0.2830)
+  band 0 ≤ |E| < 0.25: mass 0.130, mean log ratio -0.081, contribution -0.011
+  band 0.25 ≤ |E| < 1: mass 0.235, mean log ratio -1.347, contribution -0.317
+  band 1 ≤ |E| < 9: mass 0.635, mean log ratio -0.903, contribution -0.574
+  total R_L (θ-averaged Monte Carlo): -0.901
