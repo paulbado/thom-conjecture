@@ -40,3 +40,7 @@ import ThomLean.UpperBound.Decomp
 import ThomLean.UpperBound.Upper
 import ThomLean.UpperBound.LogMoment
 import ThomLean.Dirichlet.Strip
+import ThomLean.Round9.Kernel
+import ThomLean.Round9.FejerZero
+import ThomLean.Round9.LogDet
+import ThomLean.Round9.Tightness
