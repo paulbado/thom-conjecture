@@ -32,3 +32,9 @@ import ThomLean.ZeroLevel.LogSq
 import ThomLean.ZeroLevel.Orlicz
 import ThomLean.Dirichlet.Coarea
 import ThomLean.Dirichlet.Simple
+import ThomLean.UpperBound.Moment
+import ThomLean.UpperBound.Maximal
+import ThomLean.UpperBound.Bad
+import ThomLean.UpperBound.Gap
+import ThomLean.UpperBound.Decomp
+import ThomLean.UpperBound.Upper
