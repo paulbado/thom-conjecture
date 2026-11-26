@@ -30,19 +30,36 @@ torsion-free groups.
   quantitative bound `muA_singleton_le : μ_A{E} ≤ 2/L` for every `L ≥ 1`. The proof is a
   unique-continuation estimate along the rows of `H₃(ℤ/N)`, an eigenvalue count, vertex
   transitivity and a passage to the limit; it uses no Chebyshev summability target.
+* **Modulus of continuity.** `ThomNoAtoms.muA_Icc_le`: `μ_A([E−h_L/2, E+h_L/2]) ≤ 4/L` with
+  `h_L = 1/(L·Dᴸ)`, i.e. `μ_A(I) ≲ 1/log(1/|I|)`.
+* **Fejér criterion.** `ThomChebyshev.fejer_nonneg`, `integral_fejer`,
+  `tendsto_integral_fejer_mul_poly`, `ac_of_fejer_bounded`: the Fejér densities are positive,
+  normalised, converge to `μ` on polynomials, and `sup_N ‖F_N‖_{L^p} < ∞` (`p > 1`) gives the
+  `L^q` duality bound and `μ ≪ Lebesgue`.
 * **Conditional absolute continuity.** Each open target below implies `μ_A ≪ Lebesgue`
-  (`ThomConclusions.muA_ac_of_principal`, `muA_ac_of_weighted`, `muA_ac_of_LqTarget`).
+  (`ThomConclusions.muA_ac_of_principal`, `ThomNoAtoms.muA_ac_of_weightedTarget`,
+  `ThomConclusions.muA_ac_of_LqTarget`, `ThomFejer.muA_ac_of_fejerTarget`,
+  `ThomFejer.muA_ac_of_weightedLqTarget`).
 
 ## Open targets (named as `def … : Prop`, never assumed)
 
 | Target | Lean name | Consequence proved in Lean | Numerical status |
 |---|---|---|---|
-| `∑ τ(T_n(A/4))² < ∞` | `ThomBridge.PrincipalTarget` | `μ_A ≪ dE` with `L²(arcsine)` density (equivalence) | inconclusive (partial sums still growing at `n = 256`) |
-| `∑ (c_{n-2}+2c_n+c_{n+2})² < ∞` | `ThomBridge.WeightedTarget` | **alone** gives `μ_A ≪ dE` (`ThomNoAtoms.muA_ac_of_weightedTarget`) | inconclusive (block energy on `[128,256)` larger than on `[64,128)`) |
+| `∑ τ(T_n(A/4))² < ∞` | `ThomBridge.PrincipalTarget` | `μ_A ≪ dE` with `L²(arcsine)` density (equivalence) | numerically false (mass `≈ 0.47/log²(1/h)` at `0`, see below) |
+| `∑ (c_{n-2}+2c_n+c_{n+2})² < ∞` | `ThomBridge.WeightedTarget` | **alone** gives `μ_A ≪ dE` (`ThomNoAtoms.muA_ac_of_weightedTarget`) | inconclusive (flux averages: weighted `L²` norm grows `≈ 0.002` per octave up to `2⁸` bins) |
+| `sup_N ∫ abs(F_N)^p dρ < ∞`, `p > 1` (Fejér densities) | `ThomFejer.FejerTarget` | `μ_A ≪ dE`; `p = 3/2` gives `LqTarget 3` | numerically false for every `p > 1` (same reason) |
+| `abs τ((A/4)² P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}` | `ThomFejer.WeightedLqTarget` | with `muA_no_atoms`, `μ_A ≪ dE` | **recommended**: compatible with the exact flux averages for `q ≥ 2` |
 
 `ThomConclusions.NoAtomTarget` (`μ_A{0} = 0`) is no longer open: it is proved as
 `ThomNoAtoms.noAtomTarget`.
-| `abs τ(P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}`, some `q > 2` | `ThomConclusions.LqTarget` | `μ_A ≪ dE`, no atom hypothesis | plausible (`L^p` norms, `p ≤ 1.75`, look bounded) |
+
+"Numerically false" means: exact rational-flux averages `ν_Q` (`Q ≤ 293`, Chambers' formula,
+validated against the walk counts) give `ν_Q([−h,h]) · log²(1/h) ≈ 0.47` for
+`2⁻¹⁸ ≤ h ≤ 2⁻⁴`, stable in `Q`. The mechanism is the zero Landau level near flux `1/2`
+(`2|δ|q` bands within `e^{−0.3/|δ|}` of `0`). This is evidence, not a proof; a proof of the lower
+bound `μ_A([−h,h]) ≥ c/log²(1/h)` would refute these targets formally via
+`muA_le_of_lqTarget`. See `numerics/README.md`, round 4.
+| `abs τ(P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}`, some `q < ∞` | `ThomConclusions.LqTarget` | `μ_A ≪ dE`; forces `μ_A([−h,h]) = O(h^{1/q})` (`ThomFejer.muA_le_of_lqTarget`) | numerically false for every `q < ∞` |
 
 ## Verification
 
@@ -92,8 +109,10 @@ The live status of every module is in the summary of the latest workflow run.
 | `ThomLean.WeightedBridge` | `ThomLean/WeightedBridge.lean` | ✅ passing | 9 | 9 |
 | `ThomLean.Existence` | `ThomLean/Existence.lean` | ✅ passing | 27 | 11 |
 | `ThomLean.Conclusions` | `ThomLean/Conclusions.lean` | ✅ passing | 14 | 13 |
-| `ThomLean.Chebyshev.Duality` | `ThomLean/Chebyshev/Duality.lean` | ✅ passing | 2 | 1 |
-| `ThomLean.NoAtoms` | `ThomLean/NoAtoms.lean` | ✅ passing | 36 | 22 |
+| `ThomLean.Chebyshev.Duality` | `ThomLean/Chebyshev/Duality.lean` | ✅ passing | 3 | 2 |
+| `ThomLean.NoAtoms` | `ThomLean/NoAtoms.lean` | ✅ passing | 39 | 24 |
+| `ThomLean.Chebyshev.Fejer` | `ThomLean/Chebyshev/Fejer.lean` | ✅ passing | 20 | 15 |
+| `ThomLean.FejerTarget` | `ThomLean/FejerTarget.lean` | ✅ passing | 12 | 11 |
 
 | File | Content |
 |---|---|
@@ -114,7 +133,9 @@ The live status of every module is in the summary of the latest workflow run.
 | `ThomLean/WeightedBridge.lean` | weighted target, flux reformulation, Christoffel bound |
 | `ThomLean/Existence.lean` | finite quotients `H₃(ℤ/N)`, existence of `μ_A` |
 | `ThomLean/Conclusions.lean` | consequences for `μ_A`, `L^q` targets |
-| `ThomLean/NoAtoms.lean` | unconditional absence of atoms of `μ_A` |
+| `ThomLean/NoAtoms.lean` | unconditional absence of atoms of `μ_A`, log modulus of continuity |
+| `ThomLean/Chebyshev/Fejer.lean` | Fejér densities, positivity, Fejér criterion |
+| `ThomLean/FejerTarget.lean` | Fejér and weighted `L^q` targets for `μ_A`, power decay forced by `LqTarget` |
 | `Audit.lean` | `#print axioms` for the principal theorems |
 | `numerics/` | Python scripts and data, not part of the proofs |
 
@@ -267,6 +288,33 @@ unique continuation, and the rows `a ≡ 0, −1 (mod L)` form a set of density 
 forces any approximate eigenvector to be small. The window `h_L` shrinks exponentially in `L`;
 this is enough for atoms, but gives no modulus of continuity better than
 `μ_A([E−h, E+h]) ≲ 1/log(1/h)`, far from absolute continuity.
+
+### 7. Fejér criterion and weighted `L^q` target (round 4)
+
+| Statement | Lean name | Status |
+|---|---|---|
+| `F_N(4cos θ) = 1 + 2∑_{n≤N} (1 − n/(N+1)) c_n cos nθ` | `ThomChebyshev.fejer_cos`, `ThomFejer.fejer_muA_cos` | U |
+| `∫ F_N T_m(E/4) dρ = (1 − m/(N+1))₊ c_m`; `∫ F_N dρ = 1` | `integral_fejer_mul_cheb`, `integral_fejer` | U |
+| **Positivity**: Fejér's identity `(N+1)Φ_N = abs(∑_{k≤N} e^{ikx})²`, `K_N ≥ 0` on `[−4,4]²`, `F_N = ∫K_N dμ ≥ 0`, `‖F_N‖_{L¹(ρ)} = 1` | `fejer_identity`, `fejerKernel_nonneg`, `fejerKern_nonneg`, `fejer_nonneg`, `integral_abs_fejer` | U |
+| `∫ F_N P(E/4) dρ → ∫ P(E/4) dμ` for every polynomial | `tendsto_integral_fejer_mul_poly` | U |
+| **Fejér criterion**: `sup_N ‖F_N‖_{L^p(ρ)} ≤ M` ⇒ `abs ∫P dμ ≤ M‖P‖_{L^q(ρ)}`; for `p > 1`, `μ ≪ dE` | `lq_bound_of_fejer`, `ac_of_fejer_bounded` | C |
+| Converse in dual form: an `L^p(ρ)` density gives the `L^q` bound | `lq_bound_of_Lp_density`, `ThomFejer.lqTarget_of_Lp_density` | C |
+| `FejerTarget p ⇒ LqTarget p'`, `FejerTarget (3/2) ⇒ LqTarget 3`, `FejerTarget p ⇒ μ_A ≪ dE` | `lqTarget_of_fejerTarget`, `lqTarget_three_of_fejerTarget`, `muA_ac_of_fejerTarget` | C |
+| Quantitative duality: `μ(C) ≤ δ·B` when `C ⊆ U` and `ρ(U) ≤ δ^q` | `ThomChebyshev.measureReal_compact_le_of_poly_Lq_bound` | C |
+| `LqTarget q ⇒ μ_A(C) ≤ B·ρ(U)^{1/q}` | `ThomFejer.muA_le_of_lqTarget` | C |
+| `WeightedLqTarget q ⇒ μ_A ≪ dE` (with `muA_no_atoms`); `LqTarget q ⇒ WeightedLqTarget q` | `muA_ac_of_weightedLqTarget`, `weightedLqTarget_of_lqTarget` | C |
+| The `L^{3/2}` Fejér target | — | **P**, numerically false (see `numerics/README.md`) |
+| `WeightedLqTarget q`, `q ≥ 2` | — | **P**, recommended next target |
+| The Fejér converse `‖F_N‖_p ≤ ‖f‖_p` (Jensen plus Fubini for the positive kernel) | — | not formalized (classical) |
+
+**Remaining obstruction, stated precisely.** Unconditionally we have `μ_A{E} = 0` and
+`μ_A(I) ≲ 1/log(1/|I|)`. Absolute continuity needs `μ_A(I) → 0` uniformly as the Lebesgue
+measure of `I` (a finite union of intervals) tends to `0`. The row argument cannot give this:
+its window `h_L` shrinks like `D^{−L}`, so it only controls intervals of length `e^{−cL}` by
+`2/L`. Any `L^p` route with `p > 1` is blocked at `E = 0` by the zero Landau level near flux
+`1/2` (numerically `μ_A([−h,h]) ≈ 0.47/log²(1/h)`). The open question that remains is a
+weighted bound, for example `WeightedLqTarget 2`: an `L²` (or `L^p`, `p > 1`) density for
+`(E²/16)μ_A`.
 
 ## Numerical evidence (see `numerics/README.md`)
 

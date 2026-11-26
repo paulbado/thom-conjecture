@@ -149,3 +149,8 @@ open ThomChebyshev ThomHeisenberg ThomReductions ThomBridge
 #print axioms ThomFejer.lqTarget_of_fejerTarget
 #print axioms ThomFejer.lqTarget_three_of_fejerTarget
 #print axioms ThomFejer.lqTarget_of_Lp_density
+#print axioms ThomFejer.integral_polyFun_weighted_muA
+#print axioms ThomFejer.muA_ac_of_weightedLqTarget
+#print axioms ThomFejer.weightedLqTarget_of_lqTarget
+#print axioms ThomChebyshev.measureReal_compact_le_of_poly_Lq_bound
+#print axioms ThomFejer.muA_le_of_lqTarget

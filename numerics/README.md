@@ -130,3 +130,84 @@ The `L²` norm of the smoothed `ν`-density grows slowly; the Jackson kernel dam
 coefficients, so this column does not contradict the block table.
 This supports the `L^q` duality target with `q > 2`, i.e. an `L^p` density with `p < 2`
 (Lean: `ThomConclusions.LqTarget`, `muA_ac_of_LqTarget`).
+
+## Round 4: exact flux averages and the singularity at `E = 0`
+
+### Method (`flux_average.py`)
+
+The centre of `H₃(ℤ)` gives `μ_A = ∫_0^1 N_α dα`, where `N_α` is the density of states of
+Harper's operator `(Hψ)_j = ψ_{j+1} + ψ_{j-1} + 2cos(2π(αj+θ))ψ_j` (averaged over `θ`). The
+measures `ν_Q = Q⁻¹ ∑_{p<Q} N_{p/Q}` have moments `τ(Aⁿ)` for `n < N_Q` (Lean:
+`ThomHeisenberg.avg_fluxTrace_opA_pow` and `ThomLean/Heisenberg/Threshold.lean`). For `α = p/q`
+reduced, Chambers' relation `D(E) = 2cos k + 2cos(2πqθ)` makes `N_{p/q}` explicit: on the band
+`j` the distribution function increases by `G(D(E))` or `1 − G(D(E))`, where `G` is the
+distribution function of `2cos φ₁ + 2cos φ₂`. Band edges are eigenvalues of two `q × q` Bloch
+matrices. This gives the distribution function of `ν_Q` **exactly** (up to floating point and
+the tabulation of `G`), with no smoothing and no truncation of moments.
+
+Check (`Q = 12, 40`): `∫ Eⁿ dν_Q` agrees with the exact walk counts `τ(Aⁿ)` to `≤ 1e-5`
+relative error (the binning error of the check) for all `n ≤ N_Q`. The Chebyshev coefficients
+of `ν_293` agree with `cheb_coeffs_n256.txt` to `1e-6` for `n ≤ 68`.
+
+### Fejér norms (`fejer_lp.py`, output `out_fejer_lp.txt`)
+
+`F_N` (Lean: `ThomFejer.fejerA`) is positive (min `≈ 1.5/N`, Lean: `fejer_nonneg`), and
+`∫ F_N^{3/2} dρ = 1.228, 1.266, 1.295, 1.309, 1.318` for `N = 32, 64, 128, 192, 256`,
+`∫ F_N² dρ = 1.574, 1.687, 1.783, 1.835, 1.872`. Both still grow; on their own these numbers do
+not decide anything.
+
+### The mass at `E = 0` (`flux_local.py`, output `out_flux_local.txt`)
+
+Average density `ν_Q([−h,h])/(2h)`, `h = 2^{-j}`:
+
+| j | 4 | 6 | 8 | 10 | 12 | 14 | 16 | 18 |
+|---|---|---|---|---|---|---|---|---|
+| Q = 101 | 0.476 | 0.880 | 2.260 | 5.801 | 15.20 | 42.90 | 125.2 | 313.5 |
+| Q = 199 | 0.450 | 0.938 | 2.212 | 5.209 | 15.18 | 41.46 | 113.2 | 358.6 |
+| Q = 293 | 0.451 | 0.956 | 2.098 | 5.116 | 14.24 | 40.89 | 125.4 | 365.9 |
+
+The three values of `Q` agree at every scale. For `Q = 293`,
+`ν_Q([−h,h]) · log²(1/h) = 0.43, 0.52, 0.50, 0.48, 0.48, 0.47, 0.47, 0.44` for
+`j = 4, 6, …, 18`: the mass behaves like `≈ 0.47 / log²(1/h)` over 15 octaves, while
+`ν_Q([−h,h]) / h^{1/3}` turns upward after `j ≈ 9` (`0.097 → 0.179`).
+
+**Mechanism** (`zero_level.py`, output `out_zero_level_q401.txt`). For `α = 1/2 + δ`, exactly
+`2|δ|q` bands of `N_α` sit within `w(δ)` of `E = 0`, separated by a gap of order `1` from the
+next band (the relativistic zero Landau level of the Dirac cone of the half-flux operator), and
+`log w(δ) ≈ −0.30/|δ| + O(1)` (for example `w = 1.2e-6` at `|δ| = 0.021`, `w = 5.2e-3` at
+`|δ| = 0.051`). Averaging over `α`, the fluxes with `w(δ) < h` contribute
+`≈ ∫_{|δ| < 0.3/log(1/h)} 2|δ| dδ ≈ 0.18/log²(1/h)` to `μ_A([−h,h])`; other even-denominator
+fluxes add to the constant.
+
+**Consequences, if this persists as `Q → ∞` and `h → 0`** (it is stable in `Q` here, but
+these are finite computations):
+
+* the density of `μ_A` behaves like `1/(|E| log³(1/|E|))` at `0`: integrable, so compatible
+  with absolute continuity and with `μ_A{0} = 0` (now a theorem, `ThomNoAtoms.muA_no_atoms`),
+* but it is in **no** `L^p`, `p > 1`. By `ThomFejer.muA_le_of_lqTarget`, `LqTarget q` forces
+  `μ_A([−h,h]) = O(h^{1/q})`, so `LqTarget q` fails for every `q < ∞`. Hence `FejerTarget p`
+  fails for every `p > 1` (in particular the `L^{3/2}` target), and so does `PrincipalTarget`;
+* the Chebyshev coefficients follow `c_n ≈ (−1)^{n/2} a_n` with `a_n` of size `1/log² n`
+  (`c_100 = 0.060`, `c_200 = 0.006`, `c_250 = −0.020`), which explains the slow growth of
+  `∑ c_n²`, and the Cesàro atom means decay only like `1/log`.
+
+This corrects the round-3 reading: the growth of the smoothed density at `E = 0` is the main
+singularity. Near `E ≈ ±0.72, ±1.95, ±2.57` the exact averages give bounded average densities
+(`0.12 – 0.42` at every scale `h ≥ 2·10⁻³` for `Q = 101, 199, 293`), so the round-3 peaks there are smoothing
+artifacts at band edges rather than singularities (finer scales need larger `Q`).
+
+### The weight `E²` removes the singularity (`flux_analysis.py`, output `out_flux_dyadic.txt`)
+
+Binned `∫ f_w² dρ` for the weighted density `f_w = (E²/16) dν_Q/dρ`, `2^k` bins:
+
+| k | 5 | 6 | 7 | 8 | 9 |
+|---|---|---|---|---|---|
+| Q = 199 | 0.1598 | 0.1624 | 0.1657 | 0.1745 | 0.1930 |
+| Q = 293 | 0.1603 | 0.1627 | 0.1647 | 0.1670 | 0.1808 |
+
+Up to `k = 8` the values for the two `Q` agree and grow by about `0.002` per level; at finer
+`k` the finite-`Q` gaps dominate and the values decrease with `Q`. The binned weighted
+`L^{3/2}` norms behave the same way (`0.1880, 0.1893, 0.1902, 0.1916`). This is compatible with
+the **weighted** `L^q` target (`ThomFejer.WeightedLqTarget`, `q ≥ 2`), which together with the
+absence of atoms gives `μ_A ≪ Lebesgue` (`ThomFejer.muA_ac_of_weightedLqTarget`). It does not
+prove it.
