@@ -72,6 +72,13 @@ torsion-free groups.
   `b_k = ∑ width(w)` over zero-area closed walks (`k ≤ 2W`, `(k+1)² ≤ N`). Hence the two-scale
   identity `∫P dμ_A = 2∫P dσ_{2W} − ∫P dσ_W` (`deg P ≤ 2W`), the Fejér domination
   `0 ≤ F_n^{μ_A} ≤ 2F_n^{σ_{2W}}` and `H_n(μ_A) ≤ 2H_n(σ_{2W}) + 2 log 2 + 1` (§11).
+* **Fejér divergence at `0`, central entropy, log-determinant (round 9).**
+  `ThomRound9.fejer_muA_zero_upper` / `fejer_muA_lower`: `F_N(0) ≍ N/log²N` up to `(log log N)³`;
+  `fejer_muA_Lp_lower`: `∫F_N^p dρ ≥ c_p N^{p−1}/log^{2p}N`; `central_entropy_le`:
+  `∫_{|E|≤N^{−β}} F_N log⁺F_N dρ = O_β((log log N)³/log N)`. `det_chiral_even`:
+  `det J_{2m} = (−1)^m ∏|b_{2j}|²` for open chiral chains; `avg_logdet_grid`: on odd grids the
+  averaged normalized log-determinant is exactly `log 2/N`. `muA_ac_of_localTight`: moment
+  convergence plus local tightness (`LocalTightBound`) implies `μ_A ≪ dE` (§12).
 * **Conditional absolute continuity.** Each open target below implies `μ_A ≪ Lebesgue`
   (`ThomConclusions.muA_ac_of_principal`, `ThomNoAtoms.muA_ac_of_weightedTarget`,
   `ThomConclusions.muA_ac_of_LqTarget`, `ThomFejer.muA_ac_of_fejerTarget`,
@@ -88,6 +95,7 @@ torsion-free groups.
 | `abs τ(P(A/4)) ≤ K‖P(·/4)‖_{L^q(arcsine)}`, some `q < ∞` | `ThomConclusions.LqTarget` | `μ_A ≪ dE`; forces `μ_A([−h,h]) = O(h^{1/q})` (`ThomFejer.muA_le_of_lqTarget`); refuted by `LogSqLowerBound` (`ThomLowerBound.not_lqTarget_of_logSq`) | **false** for every `q ≥ 1` (Lean: `ThomZeroLevel.not_lqTarget`) |
 | `sup_N ∫ F_N log F_N dρ < ∞` (Fejér entropy) | `ThomWeightedL2.FejerEntropyTarget` | `μ_A ≪ dE` (`muA_ac_of_fejerEntropyTarget`); implied by every `FejerTarget p`; implied by a uniform bound on the strip entropies `H_n(σ_{2n+2})` (`ThomStrip.fejerEntropyTarget_of_strip`, round 8) | **recommended**: not contradicted by the proved lower bound (a profile with `μ([−h,h]) ≍ 1/log²(1/h)` can have finite entropy); increments decay by `≈ 0.72` per doubling of `N` up to `N = 512` |
 | `∑_k D_k(λ) < ∞`, `λ = θ_*μ_A` (dyadic discrepancies) | `Summable (ThomDyadic.dyDisc ThomDyadicTarget.lam)` | `μ_A ≪ dE` (`ThomDyadicTarget.muA_ac_of_summable_dyDisc`) | undecided: `D_k ≈ 0.03–0.04` at the levels resolved by `Q ≤ 601` |
+| uniform `ν_Q(U) ≤ K abs(U) + η` on open `U ⊆ {ε ≤ abs E}` for moment-convergent approximants | `ThomRound9.LocalTightBound` | `μ_A ≪ dE` (`ThomRound9.muA_ac_of_localTight`); follows on paper from the truncated coarea inequality plus local tightness of `R_L` (round 9) | **open**; tails of `R_L` not resolved numerically (`velocity_classes.py`) |
 | `μ_A([−h,h]) ≥ c/log²(1/h)` (a lower bound, not a regularity target) | `ThomLowerBound.LogSqLowerBound` | refutes `LqTarget q` (all `q ≥ 1`), `FejerTarget p` (all `p > 1`), `PrincipalTarget` | **proved** (`ThomZeroLevel.logSqLowerBound`, `c = 1/165888000`); numerically `≈ 0.47/log²(1/h)` |
 
 `ThomConclusions.NoAtomTarget` (`μ_A{0} = 0`) is no longer open: it is proved as
@@ -125,8 +133,8 @@ scripts/module_status.sh           # per-module build table
 
 ### Status of each module
 
-Last local verification (round 8): full `lake build` succeeds (7684 jobs),
-304 theorems audited, all depending only on `propext`, `Classical.choice`, `Quot.sound`.
+Last local verification (round 9): full `lake build` succeeds (7788 jobs),
+334 theorems audited, all depending only on `propext`, `Classical.choice`, `Quot.sound`.
 The live status of every module is in the summary of the latest workflow run.
 
 | Module | File | Build | Theorems/lemmas | Audited in Audit.lean |
@@ -173,6 +181,10 @@ The live status of every module is in the summary of the latest workflow run.
 | `ThomLean.UpperBound.Upper` | `ThomLean/UpperBound/Upper.lean` | ✅ passing | 13 | 6 |
 | `ThomLean.UpperBound.LogMoment` | `ThomLean/UpperBound/LogMoment.lean` | ✅ passing | 12 | 5 |
 | `ThomLean.Dirichlet.Strip` | `ThomLean/Dirichlet/Strip.lean` | ✅ passing | 45 | 23 |
+| `ThomLean.Round9.Kernel` | `ThomLean/Round9/Kernel.lean` | ✅ passing | 14 | 7 |
+| `ThomLean.Round9.FejerZero` | `ThomLean/Round9/FejerZero.lean` | ✅ passing | 21 | 10 |
+| `ThomLean.Round9.LogDet` | `ThomLean/Round9/LogDet.lean` | ✅ passing | 12 | 11 |
+| `ThomLean.Round9.Tightness` | `ThomLean/Round9/Tightness.lean` | ✅ passing | 2 | 2 |
 
 | File | Content |
 |---|---|
@@ -217,6 +229,10 @@ The live status of every module is in the summary of the latest workflow run.
 | `ThomLean/UpperBound/Upper.lean` | codimension min–max, `σ_N([−h,h])` bound, `logUpperBound_explicit` |
 | `ThomLean/UpperBound/LogMoment.lean` | `∫ log^s(1/abs E) dμ_A < ∞ ⟺ s < 2` |
 | `ThomLean/Dirichlet/Strip.lean` | strip graph, exact Dirichlet moments, two-scale and Fejér identities, entropy reduction |
+| `ThomLean/Round9/Kernel.lean` | Fejér kernel: upper bound, off-diagonal tail `(E−E')²K ≤ 64/(N+1)`, near-diagonal lower bound |
+| `ThomLean/Round9/FejerZero.lean` | `F_N(0) ≍ N/log²N`, `L^p` lower bounds, central entropy on `abs E ≤ N^{−β}` |
+| `ThomLean/Round9/LogDet.lean` | open chiral chain determinants, `∏(1+ω^t) = 2`, grid/circle averages of `log abs det` |
+| `ThomLean/Round9/Tightness.lean` | open-set transfer under moment convergence, local tightness ⇒ `μ_A ≪ dE` |
 | `Audit.lean` | `#print axioms` for the principal theorems |
 | `numerics/` | Python scripts and data, not part of the proofs |
 
@@ -839,6 +855,162 @@ Fejér entropies `H_n = ∫F_n log F_n dρ`. `H_n(σ_{2W})` uses `300²` grid po
   The uncorrected coarea–Jensen bound `R_L` of §10.5 is **not** used anywhere.
 * Open: `FejerEntropyTarget`, `WeightedTarget`, the dyadic target, and the strip-entropy
   hypothesis of `fejerEntropyTarget_of_strip`.
+
+### 12. Fejér divergence at `0`, central entropy, chiral log-determinant, local tightness (round 9)
+
+Labels: (U) unconditional and in Lean; (C) a conditional criterion in Lean; (P) a paper proof; (S) a sketch with an identified gap; (N) numerics; (O) open. **Absolute continuity of `μ_A` is not proved.**
+
+#### Task 1: quantitative Fejér divergence at 0 (U)
+
+File `Round9/Kernel.lean`, kernel facts. Write `Φ_N(x) = |Σ_{k≤N} e^{ikx}|²/(N+1)`, with
+`K_N(4cosθ, 4cosφ) = (Φ_N(θ−φ) + Φ_N(θ+φ))/2` (`fejerKern_cos`). On `[-4,4]²`:
+- `fejerKern_le`: `K_N ≤ N+1`.
+- `sq_mul_fejerKern_le`: `(E−E')² K_N(E,E') ≤ 64/(N+1)`. This comes from `Φ_N(x) sin²(x/2) ≤ 1/(N+1)` and the identity `4cosθ − 4cosφ = −8 sin((θ−φ)/2) sin((θ+φ)/2)`.
+- `fejerKern_ge`: `K_N(E,E') ≥ (N+1)/16` when `|E|, |E'| ≤ 1/(2(N+1))`. This uses `Φ_N(x) ≥ (N+1)/8` for `N|x| ≤ 1`, which rests on `cos 1 ≥ 2/5`.
+
+File `Round9/FejerZero.lean`, results for `F_N = fejer μ_A N`:
+
+| theorem | statement |
+|---|---|
+| `fejer_muA_lower` | `∃ c>0, N₀`: `F_N(E) ≥ c (N+1)/log²(N+1)` for all `|E| ≤ 1/(2(N+1))`, `N ≥ N₀` |
+| `fejer_muA_zero_upper` | `∃ C, N₀`: `F_N(0) ≤ C (N+1)(1+log log(N+1))³/log²(N+1)` (C = 69392) |
+| `fejer_muA_Lp_lower` | for every `p ≥ 1`: `∫ F_N^p dρ ≥ c_p (N+1)^{p−1}/log^{2p}(N+1)` |
+| `fejer_muA_L2_lower` | `∫ F_N² dρ ≥ c (N+1)/log⁴(N+1)` |
+
+How the bounds are proved:
+- **Lower bound.** `F_N(E) ≥ (N+1)/16 · μ_A([−h_N,h_N])` with `h_N = 1/(2(N+1))` (`fejer_ge_mass`). Then apply the round-6 bound `μ_A([−h,h]) ≥ c₀/log²(1/h)` (`logSqLowerBound`).
+- **Upper bound.** `F_N(0) ≤ (N+1)μ_A([−r,r]) + 64/((N+1)r²)` (`fejer_zero_le_mass`). Take `r = (N+1)^{−1/2}` and use the round-8 bound `logUpperBound_explicit`. No dyadic sum is needed.
+- **L^p bound.** Integrate the pointwise lower bound over `[−h_N,h_N]`, using `ρ([−h,h]) ≥ h/(2π)` (`arcsine_Icc_ge`).
+
+Together these give `F_N(0) ≍ N/log²N` up to the `(log log N)³` factor. So Fejér `L^p` boundedness fails for every `p > 1`. This is consistent with, and quantifies, the round-6 refutation `not_fejerTarget_of_logSq`.
+
+#### Task 2: central entropy contribution (U)
+
+`central_entropy_le` (0 < β < 1):
+
+`∫_{|E| ≤ (N+1)^{−β}} F_N log⁺F_N dρ ≤ C_β (1 + log log(N+1))³ / log(N+1)` for `N ≥ ⌈e^{122/β}⌉`,
+
+with `C_β = 69136/β² + 256 M/ε²`, `ε = (1−β)/2`, and `M` the arcsine density bound on `[−2,2]`. The proof has four steps:
+
+1. **Pointwise bound.** `log⁺F_N ≤ log(N+1)`, from `F_N ≤ N+1` (`mul_max_log_le`).
+2. **Exchange (Fejér positivity).** `∫_I F_N dρ = ∫ G dμ_A`, where `G(E') = ∫_I K_N(E,E')dρ(E)` (`setIntegral_fejer_eq`). This uses finite Chebyshev sums, not Fubini. We have `0 ≤ G ≤ 1`, and the off-diagonal tail gives `G(E') ≤ ρ(I)·64/((N+1)h²)` for `|E'| ≥ 2h`. Hence `∫_{[−h,h]} F_N dρ ≤ μ_A([−2h,2h]) + ρ([−h,h])·64/((N+1)h²)` (`setIntegral_fejer_le`).
+3. **Log upper bound.** `μ_A([−2h,2h]) ≤ C(1+log T)³/T²` with `T ≈ β log N`.
+4. **Polynomial term.** It is `O(N^{−(1−β)})`, so `log N` times it is `O((log N)^{-1})`.
+
+This is a statement about the **shrinking** window `|E| ≤ N^{−β}`. It does **not** bound the entropy on a fixed neighbourhood of 0.
+
+#### Task 3: exact logarithmic determinant
+
+##### In Lean (U), `Round9/LogDet.lean`
+
+- `chiral n b` is the open chiral chain: `J_{i,i+1} = b_i`, `J_{i+1,i} = conj b_i`, and zero diagonal.
+- `det_chiral_add_two`: `det J_{n+2}(b) = −|b₀|² det J_n(b(·+2))`, by Laplace expansion along row 0 and then column 0.
+- `det_chiral_even`: **`det J_{2m} = (−1)^m ∏_{j<m} |b_{2j}|²`**.
+- `det_chiral_odd`: `det J_{2m+1} = 0`.
+- `norm_det_chiral_even`, `log_norm_det_chiral_even`: `log|det J_{2m}| = 2 Σ_{j<m} log|b_{2j}|`.
+- `prod_one_add_root`: for odd `N` and a primitive `N`-th root `ω`, `∏_{t<N}(1+ω^t) = 2`. This comes from evaluating `X^N − 1 = ∏(X − ω^t)` at `−1`. `prod_norm_one_add_root` gives `∏|1+ω^t| = 2`, and `one_add_root_ne_zero` shows no bond vanishes.
+- `sum_range_root_shift`: grid sums of `f(ω^t)` are shift-invariant.
+- `avg_logdet_grid`: let `N` be odd and `m ≥ 1`. Take even bonds `b_t(2j) = 1 + ω^{t+s(j)}` for any offsets `s`, and arbitrary odd bonds. Then **`(1/N) Σ_{t<N} (1/2m) log|det J_{2m}(b_t)| = log 2 / N`**. The chain bonds `c(n) = 1 + ψ(t + p(n+1))` of `ThomZeroLevel.chainH` have this form with `s(j) = p(2j+1)`. The identification of `ZMod`-valued `bond` with powers of `ω` is not stated in Lean.
+- `circleAverage_log_one_add`: `circleAverage(log|1+z|) = 0` on the unit circle. This is the continuous-phase average, from Mathlib's `circleAverage_log_norm_add_const_eq_posLog`.
+
+The exact, nonzero `log 2/N` on odd grids, against `0` for continuous phases, is the finite-size correction. Every `p ∈ ℤ/N` gives the same value, including `p = 0`.
+
+##### Paper route to `∫ log|E| dμ_A = 0`
+
+Let `ν_{N,m}` be the average over `(p,t) ∈ (ℤ/N)²` of the normalized eigenvalue counting measures of the open chains `J^{p,t}_{2m}` (`2m ≤ N`, `N` an odd prime).
+
+1. **(P) Exact log moment.** `∫ log|E| dν_{N,m} = log 2 / N`. This is `avg_logdet_grid` for each `p`, then averaged over `p`.
+2. **(P) Moment matching.** For `k` below a threshold, `|∫E^k dν_{N,m} − τ(A^k)| ≤ 2k·4^k/m` once `k² < 16N`. Diagonal entries of `J^k` at distance `> k/2` from the ends equal those of the cyclic `chainH^k`. The cyclic average over `(p,t)` is the trace of `A^k` on `ℓ²(H₃(ℤ/N))`, which agrees with `H₃(ℤ)` in this range (the same mechanism as the repo's `ν_Q`). So `ν_{N,m} → μ_A` weakly as `N, m → ∞`.
+3. **(P) Lower inequality, unconditional on paper.** `log|E|` is upper semicontinuous and bounded above on `[−4,4]`. By the portmanteau theorem, `∫ log|E| dμ_A ≥ limsup ∫ log|E| dν_{N,m} = 0`. So **Δ(A) ≥ 1**. This is an instance of Lück's determinant conjecture, which is known for residually finite groups such as H₃(ℤ). It is not new.
+4. **(S) Upper inequality.** This needs uniform integrability, `sup_{N,m} ∫_{|E|<δ} |log|E|| dν_{N,m} → 0` as `δ → 0`. The plan is to adapt the round-8 adaptive dyadic decomposition to open chains:
+   - **(a)** At scale `T = log(1/h)`, cut the chain into good blocks (alternating log-bond sums `|S_k| ≤ T/4`) and bad blocks. Good blocks have no spectrum in `[−h,h]` (`chiral_gap`).
+   - **(b)** When `2m < T²` and the whole chain is good, charge **no** cut. The open ends are natural boundaries, unlike the cyclic case where one artificial cut is needed. This is what controls eigenvalues below `e^{−cm}`.
+   - **(c)** A whole bad chain occurs with probability `≲ m e^{−T/4}`, because of the exponential lower tail of `log|2cos πx|`. Summing `T·m e^{−T/4}` over `T ≥ T₀ ≫ log m` is small.
+
+   I have not written this out at the level of the round-8 proof, and it is not in Lean. **Gap:** a uniform-in-`(N,m)` version of the round-8 Bad/Decomp counting for open chains, with the deterministic `(p,t)` grid in place of random phases.
+
+**Literature audit.**
+- Deninger (arXiv 0712.0667, 0905.0604) and the Lind–Schmidt survey (arXiv 1502.06243) do not evaluate `Δ(x+x⁻¹+y+y⁻¹)` on H₃.
+- Lind–Schmidt eq. (1.1), the zero growth rate of products of `[[0,1],[1,e^{2πi(ka+b)}]]`, is closely related.
+- `∫log|E|dμ_A = 0` also follows from known results: `μ_A = ∫N_α dα`, the Thouless formula `γ_α(0) = ∫log|E|dN_α`, Bourgain–Jitomirskaya (`γ = 0` on the spectrum of the critical almost Mathieu operator), and `0 ∈ Σ_α` for irrational `α`. The last point comes from Avron–van Mouche–Simon Hausdorff continuity of `Σ_α` together with even-denominator rationals, where `0 ∈ Σ`.
+- I did not find `Δ(A) = 1` stated explicitly, but **no novelty is claimed**. The point is a self-contained, partly formal route.
+- For contrast, on `ℤ²` the same element has Mahler measure `m(x+1/x+y+1/y) = 4G/π ≈ 1.166` (G = Catalan's constant; recalled from Boyd/Rodriguez-Villegas, not re-checked).
+
+#### Task 4: truncated coarea inequality
+
+##### (P) The inequality
+
+The model: `H_L(α,θ)` is `L×L` with off-diagonal 1 and diagonal `2cos 2π(θ+iα)`. Its eigenvalues `E_{k,L}` are simple, because the off-diagonal entries are nonzero, and real-analytic in α. Define `σ_L = E_{θ,α}[(1/L)Σ_k δ_{E_k}]` and `M_L(θ,E) = #{(α,k) : E_k(α,θ) = E}`. Then `M_L ≤ L(L+1)`, because `det(E−H_L)` is a trigonometric polynomial of degree `≤ L(L+1)/2` in α that is not identically zero (its top Fourier coefficient is `±e^{…}`). Set `R_L = M_L/(L|∂_αE_k|)`.
+
+Fix θ and a Borel set B. Split `∫_0^1 (1/L)Σ_k 1_B(E_k(α))dα` according to `R_L ≤ K` or `R_L > K`. On the good part, apply the coarea formula on the finitely many monotone pieces of each branch:
+
+`∫_B (1/L) Σ_{(α,k): E_k(α)=E} 1_{R≤K}/|∂_αE_k(α)| dE`.
+
+Each term is `≤ K/M_L(θ,E)`, and there are at most `M_L(θ,E)` terms, so the integrand is `≤ K`. Averaging over θ gives
+
+**`σ_L(B) ≤ K|B| + P_L(E_{k,L} ∈ B, R_L > K)`.**
+
+With dyadic velocity classes (`|∂_αE| ∈ [2^jL, 2^{j+1}L)`), budgets `Σa_j = 1` and `R_{L,j} = M_{L,j}/(a_j L|∂_αE|)`, the same argument class by class gives the integrand bound `Σ_j K a_j = K`.
+
+##### (C) In Lean, `Round9/Tightness.lean`
+
+- `measureReal_open_le_of_moments`: if the polynomial moments of `ν_Q` converge to those of `μ`, then `ν_Q(U) ≤ c` eventually implies `μ(U) ≤ c` for open `U`. This is lower semicontinuity on open sets, proved with Urysohn, Weierstrass and inner regularity.
+- `LocalTightBound ν`: for all `ε, η > 0` there is `K` with `ν_Q(U) ≤ K|U| + η` eventually, for every open `U ⊆ {ε ≤ |E|} ∩ (−5,5)`.
+- **`muA_ac_of_localTight`**: moment convergence to `μ_A` together with `LocalTightBound` implies `μ_A ≪ Leb`.
+
+The coarea inequality together with local tightness, `lim_K limsup_L P_L(R_L > K, |E| ≥ ε) = 0`, gives `LocalTightBound(σ_L)`. Moment convergence `σ_L → μ_A` follows from boundary error `O(k/L)` plus `μ_A = ∫N_α dα` (P).
+
+Unlike the Jensen route, this needs **no** bound on `E[log R_L]`, only tightness of `R_L` away from 0. The tightness itself is **(O)**.
+
+#### Task 5: attacking local tightness
+
+##### (N) Tails
+
+From `numerics/velocity_classes.py`, output in `numerics/out_velocity_classes.txt`:
+
+| L | samples | mean M_L | median R_L / R_{L,j} | median class j | plain, global: P(R>K), K=10,20,50,100,200,500,1000 | plain, abs E ≥ 0.5 | class, abs E ≥ 0.5 |
+|---|---|---|---|---|---|---|---|
+| 16 | 400 | 61 | 0.246 / 0.355 | -1 | 0.0125 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 | 0.0100 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 | 0.0325 0.0175 0.0025 0.0000 0.0000 0.0000 0.0000 |
+| 32 | 3000 | 166 | 0.282 / 0.460 | -2 | 0.0187 0.0127 0.0057 0.0043 0.0030 0.0027 0.0013 | 0.0123 0.0077 0.0037 0.0023 0.0013 0.0010 0.0000 | 0.0210 0.0120 0.0060 0.0040 0.0027 0.0020 0.0010 |
+| 64 | 1500 | 451 | 0.313 / 0.735 | -3 | 0.0300 0.0193 0.0120 0.0073 0.0060 0.0013 0.0007 | 0.0167 0.0100 0.0060 0.0027 0.0020 0.0000 0.0000 | 0.0200 0.0080 0.0060 0.0027 0.0027 0.0013 0.0007 |
+| 128 | 400 | 1176 | 0.375 / 1.111 | -3 | 0.0325 0.0150 0.0075 0.0025 0.0025 0.0000 0.0000 | 0.0175 0.0075 0.0050 0.0025 0.0025 0.0000 0.0000 | 0.0125 0.0075 0.0025 0.0025 0.0000 0.0000 0.0000 |
+| 256 | 120 | 3025 | 0.452 / 1.474 | -5 | 0.0417 0.0250 0.0083 0.0083 0.0000 0.0000 0.0000 | 0.0167 0.0167 0.0083 0.0083 0.0000 0.0000 0.0000 | 0.0417 0.0083 0.0083 0.0083 0.0000 0.0000 0.0000 |
+
+The `|E| ≥ 1.0` rows are in the output files. For `L = 32` and `64` the larger runs are in `out_velocity_classes_large.txt`.
+
+Notes on the method:
+- Crossings are found by Sturm counts on an α-grid of size `24L²`, then refined by bisection.
+- The velocity is `−∂_αp/∂_Ep` from the three-term recurrence. It agrees with Hellmann–Feynman to about 1e−12.
+- The budgets are `a_j ∝ (1+|j|)^{−2}` on `j ∈ [−40,10]`.
+
+Observations:
+- `M_L` grows like `L^{1.4}` (a factor of about 2.6 per doubling), well below the `L(L+1)` bound. So the deterministic bound `R_L ≤ (L+1)/|∂_αE|` loses a factor `≈ L^{0.6}`.
+- Medians of `R_L` drift slowly upward, from 0.25 to 0.45 between `L = 16` and `256`. The median velocity class moves down, from −1 to −5, so with fixed budgets `a_j` the class ratios grow (median from 0.36 to 1.47). Fixed budgets are therefore not scale-adapted: an L-dependent centring of the classes would be needed.
+- The global tail at `K = 10` grows with L (0.012 → 0.042), and most of the growth comes from `|E| < 0.5`. Away from 0 (`|E| ≥ 0.5`) the `K = 10` tail stays at about 0.010–0.018 for all L.
+- At `K ≥ 100`, each estimate rests on 0–20 events. The samples (120–3000) do not resolve whether these tails decay with L.
+- **No tightness is inferred.**
+
+##### What can be proved, and where it stops
+
+1. `R_L ≤ (L+1)/|∂_αE|` (degree bound). So tightness follows from a small-ball estimate `P_L(|∂_αE| < δL, |E| ≥ ε) → 0` as `δ → 0`, uniformly in L. The numerics suggest `|∂_αE|/L` decreases with L (median class index −1 → −5), so this crude reduction is too lossy. It has to be combined with a bound `M_L ≲ L^{1.4}`, which is not proved.
+2. Phase averaging and Hellmann–Feynman give *upper* bounds: `Σ_k (∂_αE_k)² ≤ ‖∂_αH‖²_HS = O(L³)`. They give no lower small-ball bound.
+3. Sturm theory controls `M_L` through sign changes of `det(E−H_L(·,θ))`, but only by the degree.
+4. **Obstruction.** By the coarea formula, `E_θ (1/L) Σ_{E_k=E} 1/|∂_αE_k|` *is* the density `g_L` of `σ_L` at E. `LocalTightBound(σ_L)` says exactly that the `g_L` are uniformly equi-integrable on `|E| ≥ ε`, which is a weak, uniform Wegner-type estimate in the flux variable. Any proof of tightness of `R_L` has to supply such an estimate. Bounds on `∂_αE` that ignore the cancellation between `M_L` and small velocities cannot do this, because small velocities are exactly where `g_L` can concentrate. I found no argument that avoids a genuine anti-concentration estimate for `(∂_αE, M_L)`. **(O)**
+
+#### Task 6: local absolute continuity away from 0
+
+The Lean chain is complete:
+- `muA_ac_of_localTight`;
+- `muA_ac_iff_local`, with `muA_no_atoms` handling `{0}`.
+
+The analytic input is still open: local tightness of `R_L` on `|E| ≥ ε`, or equivalently a flux-variable Wegner estimate.
+
+At zero, we now have sharp two-sided control:
+- `F_N(0) ≍ N/log²N`, up to `(log log)³`;
+- the central entropy is `→ 0` on `|E| ≤ N^{−β}`;
+- `∫ log|E| dμ_A ≥ 0` (P), with `= 0` via the literature.
+
+The weighted and Fejér-entropy targets were not extended this round. Status unchanged: `WeightedTarget`, `FejerEntropyTarget`, the strip-entropy hypothesis, and absolute continuity of `μ_A` remain **open**.
 
 ## Numerical evidence (see `numerics/README.md`)
 

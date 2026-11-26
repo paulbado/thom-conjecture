@@ -341,3 +341,15 @@ Findings:
 * `H_n(μ_A) = 0.187, 0.274, 0.345, 0.397, 0.434` for `n = 8, 16, 32, 64, 128`.
 
 Evidence only. Lean proves `H_n(μ_A) ≤ 2H_n(σ_{2W}) + 2log2 + 1`. No uniform bound on either side is proved.
+
+## Round 9: coarea ratios with dyadic velocity classes (`velocity_classes.py`)
+
+* `python3 velocity_classes.py L samples [g]` samples `(θ, α, k)` for the round-7 Dirichlet model. It finds all crossings of the level `E = E_k(α,θ)` at fixed θ (Sturm counts on an α-grid of size `g·L²`, then bisection) and their velocities `−∂_αp/∂_Ep` (checked against Hellmann–Feynman). It prints the tails `P(R > K)` for `K ∈ {10,…,1000}` of the plain ratio `M_L/(L|∂_αE|)` and of the class ratio `M_{L,j}/(a_j L|∂_αE|)`, globally and on `|E| ≥ 0.5, 1`.
+* `out_velocity_classes.txt`: `L = 16, …, 128` with 400 samples, and `L = 256` with 120 samples. `out_velocity_classes_large.txt`: `L = 32` with 3000 samples and `L = 64` with 1500 samples.
+* Findings:
+  - `M_L ≈ L^{1.4}`;
+  - median `R_L` rises slowly, from 0.25 to 0.45;
+  - the global `K = 10` tail grows, from 0.012 to 0.042, mostly near 0;
+  - away from 0 the `K = 10` tail is flat at about 0.01–0.02;
+  - the tails at large K are not resolved.
+* No tightness is inferred.
